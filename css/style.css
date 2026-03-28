@@ -73,10 +73,11 @@ a {
 }
 
 .nav-logo {
-    font-size: 1.25rem;
+    font-size: 0.8rem;
     font-weight: 700;
-    letter-spacing: -0.5px;
+    letter-spacing: 2px;
     color: var(--color-black);
+    text-transform: uppercase;
 }
 
 .nav-menu {
@@ -145,6 +146,16 @@ a {
     transform: rotate(-45deg) translate(5px, -5px);
 }
 
+/* ===== SPA Pages ===== */
+.page {
+    display: none;
+    min-height: calc(100vh - 64px);
+}
+
+.page.active {
+    display: block;
+}
+
 /* ===== Hero Section ===== */
 .hero {
     min-height: 100vh;
@@ -206,6 +217,23 @@ a {
     flex-wrap: wrap;
 }
 
+/* Hero image */
+.hero-image-wrap {
+    margin: 36px auto 0;
+    max-width: 560px;
+    border-radius: 12px;
+    overflow: hidden;
+    line-height: 0;
+}
+
+.hero-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
 /* ===== Buttons ===== */
 .btn {
     display: inline-block;
@@ -256,6 +284,19 @@ a {
     color: var(--color-gray-600);
     font-size: 1rem;
     margin-bottom: 48px;
+}
+
+/* ===== Generic section page ===== */
+.section-page {
+    padding: 100px 24px;
+}
+
+.in-progress {
+    text-align: center;
+    color: var(--color-gray-400);
+    font-size: 1rem;
+    font-style: italic;
+    margin-top: 48px;
 }
 
 /* ===== About Section ===== */
