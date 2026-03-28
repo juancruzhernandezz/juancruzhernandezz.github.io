@@ -5,8 +5,7 @@ A minimal, clean personal website built with HTML, CSS, and JavaScript.
 ## Deploy on GitHub Pages
 
 1. **Create a GitHub repository** named exactly `<your-username>.github.io`
-   - For example: `juancruzhernandez.github.io` (your GitHub username must be `juancruzhernandez`)
-   - Or: `juanchernandez.github.io` (your GitHub username must be `juanchernandez`)
+   - For example: `abc.github.io` (your GitHub username must be `abc`)
 
 2. **Push the code** from this folder to that repository:
    ```bash
