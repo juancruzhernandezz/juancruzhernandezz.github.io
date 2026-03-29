@@ -14,7 +14,7 @@
     --white: #fff;
     --font: 'Inter', -apple-system, sans-serif;
     --ease: 0.25s ease;
-    --max: 1100px;
+    --max: 1280px;
 }
 
 html { scroll-behavior: auto; }
