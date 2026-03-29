@@ -60,3 +60,13 @@ hamburger.addEventListener('click', function () {
 window.addEventListener('scroll', function () {
     navbar.classList.toggle('scrolled', window.scrollY > 10);
 });
+
+// Course accordion
+document.querySelectorAll('.course-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+        var item = btn.closest('.course-item');
+        var isOpen = item.classList.contains('open');
+        item.classList.toggle('open');
+        btn.setAttribute('aria-expanded', !isOpen);
+    });
+});
