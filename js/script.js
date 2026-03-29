@@ -1,3 +1,14 @@
+// Slideshow
+const slides = document.querySelectorAll('.slideshow-img');
+if (slides.length > 1) {
+    let current = 0;
+    setInterval(() => {
+        slides[current].classList.remove('active-img');
+        current = (current + 1) % slides.length;
+        slides[current].classList.add('active-img');
+    }, 3000);
+}
+
 const hamburger = document.getElementById('hamburger');
 const navMenu = document.getElementById('nav-menu');
 const navbar = document.getElementById('navbar');
