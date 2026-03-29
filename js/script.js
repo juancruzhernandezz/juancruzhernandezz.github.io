@@ -1,47 +1,51 @@
-// Navigation elements
 const hamburger = document.getElementById('hamburger');
 const navMenu = document.getElementById('nav-menu');
 const navbar = document.getElementById('navbar');
-const navLinks = document.querySelectorAll('.nav-link');
 const pages = document.querySelectorAll('.page');
+const navLinks = document.querySelectorAll('.nav-link');
 
-// Show a section by id, hide all others
 function showPage(id) {
-    pages.forEach(p => p.classList.remove('active'));
+    // Hide every page
+    pages.forEach(p => {
+        p.classList.remove('active');
+    });
+    // Remove active from every nav link
     navLinks.forEach(l => l.classList.remove('active'));
 
-    const page = document.getElementById(id);
-    if (page) page.classList.add('active');
+    // Show target page
+    const target = document.getElementById(id);
+    if (target) target.classList.add('active');
 
+    // Highlight matching nav link
     const link = document.querySelector('.nav-link[href="#' + id + '"]');
     if (link) link.classList.add('active');
 
-    // close mobile menu
+    // Close mobile menu
     hamburger.classList.remove('active');
     navMenu.classList.remove('active');
 
-    // scroll to top
     window.scrollTo(0, 0);
 }
 
-// Intercept all internal link clicks (nav links + any href="#...")
-document.addEventListener('click', (e) => {
-    const link = e.target.closest('a[href^="#"]');
-    if (!link) return;
-    const id = link.getAttribute('href').slice(1);
-    if (document.getElementById(id)) {
+// Intercept clicks on any anchor pointing to #id
+document.addEventListener('click', function (e) {
+    const anchor = e.target.closest('a[href^="#"]');
+    if (!anchor) return;
+    const id = anchor.getAttribute('href').replace('#', '');
+    const target = document.getElementById(id);
+    if (target && target.classList.contains('page')) {
         e.preventDefault();
         showPage(id);
     }
 });
 
-// Hamburger toggle
-hamburger.addEventListener('click', () => {
+// Hamburger
+hamburger.addEventListener('click', function () {
     hamburger.classList.toggle('active');
     navMenu.classList.toggle('active');
 });
 
-// Navbar shadow on scroll
-window.addEventListener('scroll', () => {
+// Navbar border on scroll
+window.addEventListener('scroll', function () {
     navbar.classList.toggle('scrolled', window.scrollY > 10);
 });
