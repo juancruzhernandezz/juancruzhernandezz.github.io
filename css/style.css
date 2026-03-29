@@ -241,72 +241,103 @@ a { color: inherit; text-decoration: none; }
 
 /* ===== Course accordion ===== */
 .course-list {
-    max-width: 500px;
+    max-width: 520px;
     margin: 0 auto;
     text-align: left;
 }
 
 .course-item {
-    margin-bottom: 24px;
+    border-top: 1px solid var(--gray-light);
+}
+
+.course-item:last-child {
+    border-bottom: 1px solid var(--gray-light);
 }
 
 .course-toggle {
     width: 100%;
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 0;
+    justify-content: space-between;
+    padding: 18px 0;
     background: none;
     border: none;
-    border-bottom: 1px solid var(--gray-light);
-    padding-bottom: 8px;
     cursor: pointer;
     font-family: var(--font);
-    font-size: 1.1rem;
+}
+
+.course-name {
+    font-size: 1.05rem;
     font-weight: 600;
     color: var(--black);
+    letter-spacing: -0.2px;
 }
 
-.course-arrow {
-    transition: transform 0.3s ease;
+.toggle-icon {
+    font-size: 1.3rem;
+    font-weight: 300;
     color: var(--gray-mid);
+    transition: transform 0.3s ease;
+    line-height: 1;
+    user-select: none;
 }
 
-.course-item.open .course-arrow {
-    transform: rotate(180deg);
+.course-item.open .toggle-icon {
+    transform: rotate(45deg);
 }
 
 .course-content {
-    max-height: 0;
     overflow: hidden;
-    transition: max-height 0.4s ease;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.3s ease,
+                padding 0.4s ease;
+    max-height: 0;
+    opacity: 0;
+    padding-bottom: 0;
 }
 
 .course-item.open .course-content {
     max-height: 2000px;
+    opacity: 1;
+    padding-bottom: 20px;
 }
 
 .material-heading {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
+    letter-spacing: 1.8px;
     color: var(--gray-mid);
-    margin-top: 16px;
-    margin-bottom: 6px;
+    margin-top: 8px;
+    margin-bottom: 8px;
 }
 
 .material-list {
     list-style: none;
     padding: 0;
+    margin-bottom: 12px;
 }
 
 .material-list li {
-    padding: 4px 0;
+    padding: 5px 0;
+    padding-left: 12px;
+    position: relative;
+}
+
+.material-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--gray-light);
+    transform: translateY(-50%);
 }
 
 .material-list a {
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     color: var(--gray-dark);
     transition: color var(--ease);
 }
