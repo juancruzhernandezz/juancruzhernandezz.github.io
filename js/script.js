@@ -6,7 +6,7 @@ if (slides.length > 1) {
         slides[current].classList.remove('active-img');
         current = (current + 1) % slides.length;
         slides[current].classList.add('active-img');
-    }, 2500);
+    }, 4000);
 }
 
 const hamburger = document.getElementById('hamburger');
