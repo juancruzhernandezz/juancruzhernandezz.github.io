@@ -171,7 +171,7 @@ button:focus-visible {
     gap: 5px;
     font-size: 0.9rem;
     color: var(--gray-mid);
-    margin-bottom: 20px;
+    margin-bottom: 34px;
 }
 
 .hero-location::before {
@@ -180,43 +180,6 @@ button:focus-visible {
     height: 6px;
     border-radius: 50%;
     background: var(--accent);
-}
-
-.hero-actions {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 34px;
-}
-
-.button-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 40px;
-    padding: 0 18px;
-    border: 1px solid var(--accent);
-    border-radius: 8px;
-    background: var(--accent);
-    color: var(--white);
-    font-size: 0.88rem;
-    font-weight: 600;
-    transition: transform var(--ease), background var(--ease), color var(--ease), border-color var(--ease);
-}
-
-.button-link:hover {
-    transform: translateY(-2px);
-}
-
-.button-link.secondary {
-    background: var(--white);
-    color: var(--accent);
-    border-color: var(--gray-light);
-}
-
-.button-link.secondary:hover {
-    border-color: var(--accent);
 }
 
 .hero-image-wrap {
@@ -238,43 +201,6 @@ button:focus-visible {
 
 .slideshow-img.active-img {
     opacity: 1;
-}
-
-.quick-facts {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1px;
-    width: min(560px, 100%);
-    margin: 30px auto 0;
-    border: 1px solid var(--gray-light);
-    border-radius: 8px;
-    overflow: hidden;
-    background: var(--gray-light);
-}
-
-.quick-facts div {
-    padding: 14px 16px;
-    background: var(--white);
-}
-
-.fact-label,
-.fact-value {
-    display: block;
-}
-
-.fact-label {
-    margin-bottom: 3px;
-    color: var(--gray-mid);
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-}
-
-.fact-value {
-    color: var(--black);
-    font-size: 0.92rem;
-    font-weight: 600;
 }
 
 /* ===== INNER PAGES (About, Work, Other, Contact) ===== */
@@ -324,42 +250,6 @@ button:focus-visible {
 .about-content p:last-child { margin-bottom: 0; }
 .about-content strong { color: var(--black); font-weight: 600; }
 
-.about-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
-    width: min(760px, 100%);
-    margin: 32px auto 0;
-}
-
-.about-card {
-    min-height: 116px;
-    padding: 20px;
-    border: 1px solid var(--gray-light);
-    border-radius: 8px;
-    text-align: left;
-}
-
-.about-card-label,
-.about-card-text {
-    display: block;
-}
-
-.about-card-label {
-    margin-bottom: 10px;
-    color: var(--gray-mid);
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-}
-
-.about-card-text {
-    color: var(--gray-dark);
-    font-size: 0.96rem;
-    line-height: 1.55;
-}
-
 /* ===== In progress ===== */
 .in-progress {
     font-size: 1rem;
@@ -402,14 +292,6 @@ button:focus-visible {
     font-weight: 600;
     color: var(--black);
     letter-spacing: 0;
-}
-
-.course-meta {
-    display: block;
-    margin-top: 2px;
-    color: var(--gray-readable);
-    font-size: 0.8rem;
-    line-height: 1.4;
 }
 
 .toggle-icon {
@@ -592,16 +474,6 @@ button:focus-visible {
         padding: 104px 18px 54px;
     }
 
-    .hero-actions {
-        flex-direction: column;
-        align-items: stretch;
-        width: min(260px, 100%);
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .quick-facts,
-    .about-grid,
     .slide-list {
         grid-template-columns: 1fr;
     }
