@@ -15,13 +15,7 @@ const navbar = document.getElementById('navbar');
 const pages = document.querySelectorAll('.page');
 const navLinks = document.querySelectorAll('.nav-link');
 
-function setMobileMenu(open) {
-    hamburger.classList.toggle('active', open);
-    navMenu.classList.toggle('active', open);
-    hamburger.setAttribute('aria-expanded', open);
-}
-
-function showPage(id, updateHash = true) {
+function showPage(id) {
     // Hide every page
     pages.forEach(p => {
         p.classList.remove('active');
@@ -31,19 +25,15 @@ function showPage(id, updateHash = true) {
 
     // Show target page
     const target = document.getElementById(id);
-    if (!target) return;
-    target.classList.add('active');
+    if (target) target.classList.add('active');
 
     // Highlight matching nav link
     const link = document.querySelector('.nav-link[href="#' + id + '"]');
     if (link) link.classList.add('active');
 
     // Close mobile menu
-    setMobileMenu(false);
-
-    if (updateHash && window.location.hash !== '#' + id) {
-        history.pushState(null, '', '#' + id);
-    }
+    hamburger.classList.remove('active');
+    navMenu.classList.remove('active');
 
     window.scrollTo(0, 0);
 }
@@ -62,7 +52,8 @@ document.addEventListener('click', function (e) {
 
 // Hamburger
 hamburger.addEventListener('click', function () {
-    setMobileMenu(!navMenu.classList.contains('active'));
+    hamburger.classList.toggle('active');
+    navMenu.classList.toggle('active');
 });
 
 // Navbar border on scroll
@@ -74,23 +65,8 @@ window.addEventListener('scroll', function () {
 document.querySelectorAll('.course-toggle').forEach(function (btn) {
     btn.addEventListener('click', function () {
         var item = btn.closest('.course-item');
-        var content = item.querySelector('.course-content');
         var isOpen = item.classList.contains('open');
         item.classList.toggle('open');
         btn.setAttribute('aria-expanded', !isOpen);
-        if (content) {
-            content.setAttribute('aria-hidden', isOpen);
-            content.toggleAttribute('inert', isOpen);
-        }
     });
 });
-
-window.addEventListener('popstate', function () {
-    var id = window.location.hash.replace('#', '') || 'home';
-    showPage(id, false);
-});
-
-var initialPage = window.location.hash.replace('#', '');
-if (initialPage && document.getElementById(initialPage)) {
-    showPage(initialPage, false);
-}
