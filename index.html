@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Juan Cruz Hernández</title>
+    <meta name="description" content="Personal website of Juan Cruz Hernández, economics graduate student at Universidad Torcuato Di Tella.">
     <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=20260626-2">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -13,7 +14,7 @@
     <!-- Navigation -->
     <nav class="navbar" id="navbar">
         <div class="nav-container">
-            <a href="#home" class="nav-logo">JUAN CRUZ HERNANDEZ</a>
+            <a href="#home" class="nav-logo">JUAN CRUZ HERNÁNDEZ</a>
             <div class="nav-menu" id="nav-menu">
                 <a href="#home" class="nav-link active">Home</a>
                 <a href="#about" class="nav-link">About</a>
@@ -22,7 +23,7 @@
                 <a href="#other" class="nav-link">Other</a>
                 <a href="#contact" class="nav-link">Contact</a>
             </div>
-            <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+            <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-menu">
                 <span></span>
                 <span></span>
                 <span></span>
@@ -36,12 +37,28 @@
             <div class="hero-container">
                 <h1 class="hero-title">Juan Cruz Hernández</h1>
                 <p class="hero-subtitle">Economics Graduate Student at Universidad Torcuato Di Tella</p>
-                <p class="hero-location">
-                
-                </p>
+                <p class="hero-location">Buenos Aires, Argentina</p>
+                <div class="hero-actions" aria-label="Primary links">
+                    <a href="#teaching" class="button-link">Teaching</a>
+                    <a href="#contact" class="button-link secondary">Contact</a>
+                </div>
                 <div class="hero-image-wrap">
                     <img src="assets/buenos_aires.jpg" alt="Buenos Aires" class="slideshow-img active-img" loading="eager">
                     <img src="assets/general_roca.jpg" alt="General Roca" class="slideshow-img" loading="lazy">
+                </div>
+                <div class="quick-facts" aria-label="Quick profile facts">
+                    <div>
+                        <span class="fact-label">Program</span>
+                        <span class="fact-value">M.A. Economics</span>
+                    </div>
+                    <div>
+                        <span class="fact-label">Institution</span>
+                        <span class="fact-value">UTDT</span>
+                    </div>
+                    <div>
+                        <span class="fact-label">Teaching</span>
+                        <span class="fact-value">Economía I</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -58,8 +75,22 @@
                         <strong>Universidad Torcuato Di Tella</strong> in Buenos Aires, Argentina.
                     </p>
                     <p>
-                        Based in Buenos Aires, Argentina.
+                        This site collects teaching material, course resources, and contact links in one place.
                     </p>
+                    <div class="about-grid">
+                        <div class="about-card">
+                            <span class="about-card-label">Graduate studies</span>
+                            <span class="about-card-text">Master's in Economics at UTDT.</span>
+                        </div>
+                        <div class="about-card">
+                            <span class="about-card-label">Teaching</span>
+                            <span class="about-card-text">Course material for Economía I.</span>
+                        </div>
+                        <div class="about-card">
+                            <span class="about-card-label">Based in</span>
+                            <span class="about-card-text">Buenos Aires, Argentina.</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -86,11 +117,14 @@
 
                     <!-- Economía I -->
                     <div class="course-item">
-                        <button class="course-toggle" aria-expanded="false">
-                            <span class="course-name">Economía I</span>
+                        <button class="course-toggle" aria-expanded="false" aria-controls="economia-i-content">
+                            <span>
+                                <span class="course-name">Economía I</span>
+                                <span class="course-meta">2026 · 23 slide decks · practice material</span>
+                            </span>
                             <span class="toggle-icon">+</span>
                         </button>
-                        <div class="course-content">
+                        <div class="course-content" id="economia-i-content" aria-hidden="true" inert>
 
                             <h4 class="material-heading">Syllabus</h4>
                             <ul class="material-list">
@@ -98,7 +132,7 @@
                             </ul>
 
                             <h4 class="material-heading">Slides</h4>
-                            <ul class="material-list">
+                            <ul class="material-list slide-list">
                                 <li><a href="Economía 1 2026/Slides/00. Presentación curso.pdf" target="_blank" rel="noopener noreferrer">00. Presentación curso</a></li>
                                 <li><a href="Economía 1 2026/Slides/01. Introducción al curso.pdf" target="_blank" rel="noopener noreferrer">01. Introducción al curso</a></li>
                                 <li><a href="Economía 1 2026/Slides/02. FPP.pdf" target="_blank" rel="noopener noreferrer">02. FPP</a></li>
@@ -120,6 +154,8 @@
                                 <li><a href="Economía 1 2026/Slides/06.0 Equilibrio.pdf" target="_blank" rel="noopener noreferrer">06.0 Equilibrio</a></li>
                                 <li><a href="Economía 1 2026/Slides/06.1 Equilibrio largo plazo.pdf" target="_blank" rel="noopener noreferrer">06.1 Equilibrio largo plazo</a></li>
                                 <li><a href="Economía 1 2026/Slides/07.0 Eficiencia.pdf" target="_blank" rel="noopener noreferrer">07.0 Eficiencia</a></li>
+                                <li><a href="Economía 1 2026/Slides/08.0 Intervencion.pdf" target="_blank" rel="noopener noreferrer">08.0 Intervención</a></li>
+                                <li><a href="Economía 1 2026/Slides/09.0 Monopolio.pdf" target="_blank" rel="noopener noreferrer">09.0 Monopolio</a></li>
                             </ul>
 
                             <h4 class="material-heading">Material Adicional</h4>
@@ -154,11 +190,14 @@
 
                     <!-- Economía II -->
                     <div class="course-item">
-                        <button class="course-toggle" aria-expanded="false">
-                            <span class="course-name">Economía II</span>
+                        <button class="course-toggle" aria-expanded="false" aria-controls="economia-ii-content">
+                            <span>
+                                <span class="course-name">Economía II</span>
+                                <span class="course-meta">Coming soon</span>
+                            </span>
                             <span class="toggle-icon">+</span>
                         </button>
-                        <div class="course-content">
+                        <div class="course-content" id="economia-ii-content" aria-hidden="true" inert>
                             <p class="in-progress">In progress…</p>
                         </div>
                     </div>
@@ -214,6 +253,6 @@
         </div>
     </footer>
 
-    <script src="js/script.js"></script>
+    <script src="js/script.js?v=20260626-2"></script>
 </body>
 </html>
