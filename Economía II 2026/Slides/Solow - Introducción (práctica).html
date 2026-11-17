@@ -1,0 +1,1295 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Introducción a Solow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f1ea; --surface:#fffdf8; --surface2:#f0ebe0; --ink:#16213e; --muted:#5d6377; --line:#d8d0bf;
+  --accent:#c98a00; --accent-soft:#f6e4b5;
+  --prod:#3456d1; --inv:#0d8a7c; --dep:#cf3d55; --cons:#c98a00; --violet:#6a4fd1;
+  --shadow:0 10px 30px rgba(22,33,62,.08);
+  --sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --serif:'Fraunces',Georgia,serif;
+  --math:'Source Serif 4','STIX Two Text',Cambria,'Times New Roman',serif;
+}
+:root[data-theme="dark"]{
+  --bg:#0d1120; --surface:#151a2d; --surface2:#1c2238; --ink:#eef0f7; --muted:#9aa3bd; --line:#2b3352;
+  --accent:#ffc23d; --accent-soft:#3a3218;
+  --prod:#86a2ff; --inv:#3ccfbd; --dep:#ff6b80; --cons:#ffc23d; --violet:#a894ff;
+  --shadow:0 10px 30px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden}
+body{transition:background .4s}
+
+/* ---------- deck & scaling ---------- */
+#deck{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:center center}
+.slide{position:absolute;inset:0;padding:54px 72px 64px;background:var(--bg);
+  opacity:0;visibility:hidden;transform:translateX(40px);transition:opacity .5s ease,transform .5s ease,visibility .5s;
+  display:flex;flex-direction:column}
+.slide.active{opacity:1;visibility:visible;transform:none}
+.slide.past{transform:translateX(-40px)}
+.slide h2{font-family:var(--serif);font-weight:700;font-size:44px;letter-spacing:-.5px;line-height:1.1;margin-bottom:22px}
+.slide h2 .num{color:var(--accent);margin-right:10px}
+.kicker{font-size:14px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+p,li{font-size:23px;line-height:1.45}
+.muted{color:var(--muted)}
+.small{font-size:18px}
+b,strong{font-weight:650}
+ul.clean{list-style:none}
+ul.clean li{position:relative;padding-left:30px;margin:10px 0}
+ul.clean li::before{content:"";position:absolute;left:4px;top:.62em;width:10px;height:10px;border-radius:50%;background:var(--accent)}
+
+/* footer, progress */
+#progress{position:fixed;left:0;top:0;height:4px;background:var(--accent);transition:width .4s;z-index:20}
+#footer{position:absolute;left:72px;right:72px;bottom:22px;display:flex;justify-content:space-between;font-size:14px;color:var(--muted);pointer-events:none}
+#nav{position:fixed;right:18px;bottom:14px;display:flex;gap:8px;z-index:20;opacity:.35;transition:opacity .3s}
+#nav:hover{opacity:1}
+#nav button{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font:600 14px var(--sans);cursor:pointer}
+
+/* fragments */
+[data-f]{opacity:0;transform:translateY(10px);transition:opacity .55s ease,transform .55s ease}
+svg [data-f]{transform:none}
+[data-f].shown{opacity:1;transform:none}
+path.draw{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.4s ease}
+.shown path.draw, .slide.active .always path.draw{stroke-dashoffset:0}
+
+/* ---------- math ---------- */
+.m{font-family:var(--math);white-space:nowrap}
+.m i,i.v{font-family:var(--math);font-style:italic}
+.eq{font-family:var(--math);font-size:34px;display:block;text-align:center;margin:14px 0;line-height:1.5}
+.eq.left{text-align:left}
+.eq.sm{font-size:28px}
+.eq i{font-style:italic}
+sup,sub{font-size:.62em;line-height:0}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .12em}
+.frac>span{padding:0 .18em;line-height:1.15}
+.frac>span:first-child{border-bottom:1.6px solid currentColor}
+sup .frac{font-size:1em}
+.par{font-size:1.9em;font-weight:300;line-height:0;vertical-align:-.08em}
+.lbl{display:inline-block;font-family:var(--sans);font-size:15px;font-weight:600;padding:3px 9px;border-radius:999px;margin-left:12px;vertical-align:middle;white-space:nowrap}
+.c-prod{color:var(--prod)} .c-inv{color:var(--inv)} .c-dep{color:var(--dep)} .c-cons{color:var(--cons)} .c-acc{color:var(--accent)}
+.bg-prod{background:color-mix(in srgb,var(--prod) 14%,transparent);color:var(--prod)}
+.bg-inv{background:color-mix(in srgb,var(--inv) 14%,transparent);color:var(--inv)}
+.bg-dep{background:color-mix(in srgb,var(--dep) 14%,transparent);color:var(--dep)}
+.bg-cons{background:color-mix(in srgb,var(--cons) 18%,transparent);color:var(--cons)}
+
+/* ---------- components ---------- */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:44px;flex:1;min-height:0}
+.cols.wide-r{grid-template-columns:.85fr 1.15fr}
+.cols.wide-l{grid-template-columns:1.2fr .8fr}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px 26px;box-shadow:var(--shadow)}
+.card h3{font-family:var(--serif);font-size:24px;margin-bottom:8px}
+.card p{font-size:19px;line-height:1.4}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.callout{border-left:5px solid var(--accent);background:var(--surface);border-radius:0 14px 14px 0;padding:16px 22px;box-shadow:var(--shadow)}
+.callout p{font-size:20px}
+.callout.warn{border-color:var(--dep)}
+.chip{display:inline-block;font-size:14px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--accent-soft);color:var(--ink);margin-right:6px}
+ol.steps{list-style:none;counter-reset:st}
+ol.steps li{counter-increment:st;position:relative;padding-left:46px;margin:10px 0;font-size:19px;line-height:1.45}
+ol.steps li::before{content:counter(st);position:absolute;left:0;top:0;width:32px;height:32px;border-radius:50%;background:var(--accent);color:#fff;font:700 17px var(--sans);display:grid;place-items:center}
+.grid4.compact .card{padding:14px 18px}.grid4.compact .card p{font-size:16px;line-height:1.38}.grid4.compact .icon{width:34px;height:34px;font-size:18px;margin-bottom:6px;border-radius:9px}.grid4.compact h3{font-size:20px;margin-bottom:4px}
+.icon{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;margin-bottom:12px;font-size:24px}
+
+/* ---------- cover ---------- */
+#s-cover{justify-content:center}
+#s-cover h1{font-family:var(--serif);font-size:96px;line-height:1;letter-spacing:-2px;margin:10px 0 18px}
+#s-cover h1 span{color:var(--accent)}
+#s-cover .sub{font-size:26px;color:var(--muted);max-width:640px}
+#cover-art{position:absolute;right:40px;top:90px;width:560px;height:520px}
+.keys{margin-top:44px;font-size:15px;color:var(--muted)}
+.keys kbd{font-family:var(--sans);font-size:13px;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:2px 7px;background:var(--surface);margin:0 3px}
+@keyframes pulse{0%,100%{r:7}50%{r:12}}
+.pulse{animation:pulse 2s ease-in-out infinite}
+@keyframes drawIn{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+.slide.active .autodraw{stroke-dasharray:1;animation:drawIn 1.8s ease forwards}
+.autodraw{stroke-dasharray:1;stroke-dashoffset:1}
+.autodraw.d2{animation-delay:.5s!important}.autodraw.d3{animation-delay:1s!important}
+@keyframes fadeIn{to{opacity:1}}
+.slide.active .late{animation:fadeIn .8s ease 1.9s forwards}
+.late{opacity:0}
+
+/* ---------- agenda ---------- */
+.agenda{display:grid;grid-template-columns:1fr 1fr;gap:16px 28px;margin-top:8px}
+.ag{display:flex;align-items:center;gap:18px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 20px;box-shadow:var(--shadow)}
+.ag .n{font-family:var(--serif);font-size:36px;font-weight:700;color:var(--accent);width:40px}
+.ag .t{font-size:21px;font-weight:600}
+.ag .d{font-size:16px;color:var(--muted)}
+.ag .min{margin-left:auto;font-weight:700;color:var(--muted);font-size:16px}
+.ag.hl{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.ag.hl .d,.ag.hl .min{color:color-mix(in srgb,var(--bg) 70%,transparent)}
+.timebar{display:flex;height:16px;border-radius:999px;overflow:hidden;margin-top:26px}
+.timebar div{height:100%}
+
+/* ---------- rule of 70 ---------- */
+input[type=range]{width:100%;accent-color:var(--accent);height:28px;cursor:pointer}
+.big{font-family:var(--serif);font-size:64px;font-weight:700;color:var(--accent);line-height:1}
+.barrow{display:grid;grid-template-columns:150px 1fr 90px;align-items:center;gap:14px;margin:14px 0;font-size:18px}
+.bartrack{height:30px;background:var(--surface2);border-radius:8px;overflow:hidden}
+.barfill{height:100%;border-radius:8px;transition:width .5s ease}
+
+/* ---------- timeline ---------- */
+.timeline{position:relative;display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-top:40px}
+.timeline::before{content:"";position:absolute;left:0;right:0;top:22px;height:3px;background:var(--line)}
+.tl{position:relative;padding-top:52px}
+.tl::before{content:"";position:absolute;left:8px;top:13px;width:20px;height:20px;border-radius:50%;background:var(--surface);border:4px solid var(--accent)}
+.tl.key::before{background:var(--accent);box-shadow:0 0 0 6px var(--accent-soft)}
+.tl .yr{font-family:var(--serif);font-size:28px;font-weight:700}
+.tl .who{font-weight:650;font-size:17px;margin:4px 0 6px}
+.tl p{font-size:16px;line-height:1.38;color:var(--muted)}
+
+/* ---------- graphs ---------- */
+svg text{fill:var(--ink)}
+svg text:not([font-family]){font-family:var(--math)}
+svg text[font-family="Inter"]{font-family:var(--sans)}
+svg .axis{stroke:var(--ink);stroke-width:2}
+svg .tick text{font-family:var(--sans);font-size:13px;fill:var(--muted)}
+svg .grid{stroke:var(--line);stroke-width:1}
+.graphbox{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:10px}
+.steptext>div{margin-bottom:12px}
+.steptext p{font-size:20px}
+.readout{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.readout div{background:var(--surface2);border-radius:12px;padding:8px 10px;text-align:center}
+.readout .v{font-family:var(--math);font-size:24px;font-weight:600}
+.readout .k{font-size:13px;color:var(--muted)}
+.ctrl{display:grid;grid-template-columns:140px 1fr 56px;align-items:center;gap:10px;margin:2px 0}
+.ctrl label{font-family:var(--math);font-size:19px;white-space:nowrap}
+.ctrl output{font-family:var(--math);font-size:18px;text-align:right}
+.btn{background:var(--ink);color:var(--bg);border:none;border-radius:10px;padding:9px 14px;font:600 15px var(--sans);cursor:pointer;margin:4px 6px 0 0}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn:hover{filter:brightness(1.15)}
+.hint{font-size:16px;color:var(--muted);margin-top:8px;min-height:44px}
+
+/* flow diagram */
+@keyframes flow{to{stroke-dashoffset:-24}}
+.flow{stroke-dasharray:8 4;animation:flow 1s linear infinite}
+
+/* notes */
+#notes{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);width:min(960px,94vw);max-height:38vh;overflow:auto;
+  background:rgba(15,20,36,.94);color:#eef0f7;border-radius:14px;padding:16px 22px;font-size:16px;line-height:1.5;z-index:30;display:none;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+#notes.on{display:block}
+#notes .hd{display:flex;justify-content:space-between;font-size:13px;color:#ffc23d;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+aside.notes{display:none}
+.tag-app{position:absolute;top:26px;right:72px;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--dep);border:1.5px solid var(--dep);border-radius:999px;padding:4px 12px}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="deck">
+
+<!-- ===================== 1. PORTADA ===================== -->
+<section class="slide" id="s-cover" data-sec="">
+  <svg id="cover-art" viewBox="0 0 560 520" aria-hidden="true">
+    <defs><marker id="ah0" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--ink)"/></marker></defs>
+    <line x1="40" y1="480" x2="540" y2="480" class="axis" marker-end="url(#ah0)"/>
+    <line x1="40" y1="480" x2="40" y2="20" class="axis" marker-end="url(#ah0)"/>
+    <path id="cv-prod" class="autodraw" pathLength="1" fill="none" stroke="var(--prod)" stroke-width="4"/>
+    <path id="cv-inv" class="autodraw d2" pathLength="1" fill="none" stroke="var(--inv)" stroke-width="4"/>
+    <path id="cv-dep" class="autodraw d3" pathLength="1" fill="none" stroke="var(--dep)" stroke-width="4"/>
+    <g class="late">
+      <line id="cv-kline" stroke="var(--muted)" stroke-dasharray="5 5" stroke-width="1.5"/>
+      <circle id="cv-dot" r="8" fill="var(--accent)" class="pulse"/>
+      <text id="cv-klab" font-size="26" font-style="italic">k*</text>
+    </g>
+  </svg>
+  <div style="position:relative;z-index:1;max-width:600px">
+    <div class="kicker">Economía II · Clase práctica</div>
+    <h1>El modelo<br>de <span>Solow</span></h1>
+    <p class="sub">Ahorro, capital y crecimiento de largo plazo.<br>Una introducción rápida + Ejercicio 1 del TP.</p>
+    <p class="keys"><kbd>→</kbd><kbd>espacio</kbd> avanzar · <kbd>←</kbd> volver · <kbd>F</kbd> pantalla completa · <kbd>N</kbd> notas · <kbd>T</kbd> modo oscuro</p>
+  </div>
+  <aside class="notes">Arranque: avisar que como la teórica todavía no llegó a Solow, hoy hacemos una intro de ~30–35 min y después resolvemos el Ejercicio 1 del TP en el pizarrón. Las slides tienen un “laboratorio” interactivo para la estática comparada.</aside>
+</section>
+
+<!-- ===================== 2. PLAN ===================== -->
+<section class="slide" data-sec="Plan de la clase">
+  <div class="kicker">Hoja de ruta</div>
+  <h2>Plan de hoy</h2>
+  <div class="agenda">
+    <div class="ag" data-f="1"><span class="n">1</span><div><div class="t">La gran pregunta</div><div class="d">¿Por qué algunos países son ricos y otros no? El caso argentino</div></div></div>
+    <div class="ag" data-f="1"><span class="n">2</span><div><div class="t">¿Qué es el modelo de Solow?</div><div class="d">Cómo nace, qué hace y para qué se usa</div></div></div>
+    <div class="ag" data-f="1"><span class="n">3</span><div><div class="t">El modelo, paso a paso</div><div class="d">Supuestos, ecuaciones y variables per cápita</div></div></div>
+    <div class="ag" data-f="1"><span class="n">4</span><div><div class="t">Estado estacionario</div><div class="d">Qué es, qué nos dice, el gráfico y la transición</div></div></div>
+    <div class="ag" data-f="1"><span class="n">5</span><div><div class="t">Predicciones y límites</div><div class="d">Regla de oro y lo que el modelo no explica</div></div></div>
+    <div class="ag hl" data-f="2"><span class="n" style="color:var(--accent)">6</span><div><div class="t">Ejercicio 1 del TP</div><div class="d">Per cápita · estado estacionario · estática comparada · transición</div></div></div>
+  </div>
+  <aside class="notes">Mostrar el plan rápido. La idea: entender la intuición y el gráfico; la derivación algebraica completa la hacemos juntos en el ejercicio (incisos 1 y 2), así no la repetimos dos veces.</aside>
+</section>
+
+<!-- ===================== 3. LA GRAN PREGUNTA ===================== -->
+<section class="slide" data-sec="1 · La gran pregunta">
+  <div class="kicker">1 · Motivación</div>
+  <h2>¿Por qué algunos países son mucho más ricos que otros?</h2>
+  <div class="cols wide-l">
+    <div>
+      <p>Diferencias <b>chicas</b> en la tasa de crecimiento, sostenidas en el tiempo, se convierten en diferencias <b>enormes</b> en el nivel de ingreso.</p>
+      <div class="card" style="margin-top:22px">
+        <p class="small muted">Tasa de crecimiento anual del ingreso per cápita del país B</p>
+        <div style="display:flex;align-items:center;gap:18px">
+          <input type="range" id="g70" min="0.5" max="6" step="0.1" value="3">
+          <span class="m" style="font-size:28px;font-weight:600;width:90px" id="g70v">3.0%</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:14px;margin-top:10px">
+          <span class="big" id="dbl">23</span><span style="font-size:22px">años para <b>duplicar</b> el ingreso</span>
+        </div>
+        <p class="small muted" style="margin-top:6px">Regla del 70: años para duplicar ≈ 70 / (tasa en %)</p>
+      </div>
+    </div>
+    <div>
+      <p class="small muted" style="margin-bottom:6px">Ingreso per cápita dentro de <b>50 años</b> (hoy = 1)</p>
+      <div class="barrow"><span>País A · 1%</span><div class="bartrack"><div class="barfill" id="barA" style="background:var(--muted)"></div></div><span class="m" id="valA" style="font-size:22px">×1.64</span></div>
+      <div class="barrow"><span>País B · <span id="gB">3.0%</span></span><div class="bartrack"><div class="barfill" id="barB" style="background:var(--accent)"></div></div><span class="m" id="valB" style="font-size:22px">×4.38</span></div>
+      <div class="callout" style="margin-top:26px" data-f="1">
+        <p>Hoy: un primer modelo para pensar <b>de dónde viene el crecimiento</b> y <b>hacia dónde converge</b> una economía.</p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Mover el slider en vivo: con 1% se duplica en ~70 años, con 3% en ~23, con 5% en ~14. Después de 50 años, la diferencia entre 1% y 3% es casi ×2,7. Pregunta disparadora: ¿qué hace que un país ahorre/acumule capital/crezca más?</aside>
+</section>
+
+<!-- ===================== 4a. CINCO PAÍSES ===================== -->
+<section class="slide" data-sec="1 · La gran pregunta">
+  <div class="kicker">1 · La evidencia</div>
+  <h2>Sesenta años, cinco países</h2>
+  <div class="cols" style="grid-template-columns:1.3fr .7fr;gap:26px">
+    <div class="graphbox"><svg id="g-cx" viewBox="0 0 760 420" width="100%"></svg></div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card" style="padding:12px 16px">
+        <table style="width:100%;border-collapse:collapse;font-size:16px;text-align:right">
+          <tr class="muted" style="font-size:13px"><th style="text-align:left;font-weight:600">PIB per cápita</th><th style="font-weight:600">1960</th><th style="font-weight:600">2025</th><th style="font-weight:600">crec. anual</th></tr>
+          <tr style="border-top:1px solid var(--line)"><td style="text-align:left;padding:6px 4px"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--prod);margin-right:8px"></span><b>EE.UU.</b></td><td id="cx-USA-0"></td><td id="cx-USA-1"></td><td id="cx-USA-g" style="font-weight:700"></td></tr>
+          <tr style="border-top:1px solid var(--line)"><td style="text-align:left;padding:6px 4px"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--dep);margin-right:8px"></span><b>Argentina</b></td><td id="cx-ARG-0"></td><td id="cx-ARG-1"></td><td id="cx-ARG-g" style="font-weight:700"></td></tr>
+          <tr data-f="1" style="border-top:1px solid var(--line)"><td style="text-align:left;padding:6px 4px"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--inv);margin-right:8px"></span><b>Corea del Sur</b></td><td id="cx-KOR-0"></td><td id="cx-KOR-1"></td><td id="cx-KOR-g" style="font-weight:700"></td></tr>
+          <tr data-f="2" style="border-top:1px solid var(--line)"><td style="text-align:left;padding:6px 4px"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--violet);margin-right:8px"></span><b>Japón</b></td><td id="cx-JPN-0"></td><td id="cx-JPN-1"></td><td id="cx-JPN-g" style="font-weight:700"></td></tr>
+          <tr data-f="3" style="border-top:1px solid var(--line)"><td style="text-align:left;padding:6px 4px"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--accent);margin-right:8px"></span><b>España</b></td><td id="cx-ESP-0"></td><td id="cx-ESP-1"></td><td id="cx-ESP-g" style="font-weight:700"></td></tr>
+        </table>
+        <p class="muted" style="font-size:12px;margin-top:6px">Miles de US$ de 2015 · crecimiento promedio 1960–2025.</p>
+      </div>
+      <div class="callout" data-f="4" style="padding:10px 16px"><p class="small">Los que arrancaron <b>más pobres</b> crecieron <b>más rápido</b> y se acercaron a Estados Unidos… pero <b>no todos</b>. ¿Por qué? → Solow.</p></div>
+    </div>
+  </div>
+  <p class="muted" style="margin-top:6px;font-size:12px">Escala logarítmica: la <b>pendiente</b> de cada línea es su tasa de crecimiento. Fuente: Banco Mundial, WDI, NY.GDP.PCAP.KD (US$ constantes de 2015).</p>
+  <aside class="notes">Explicar la escala log: misma pendiente = misma tasa; subir un escalón (ej. de 10k a 20k) es duplicar. Primero EE.UU. (≈2% parejo, la "frontera") y Argentina (arranca segunda, crece ≈0,9% y con crisis). Clic: Corea, en 1960 tenía ~1/7 del ingreso argentino, creció ≈5,7% por año y nos pasó en 1989; hoy casi el triple. Clic: Japón, crece ≈5% hasta 1990, llega a ~77% del nivel de EE.UU. y después se frena (&lt;1%): se acerca a su estado estacionario → justo lo que predice Solow. Clic: España, convergencia más gradual. Clic: mensaje: convergencia… condicional (Argentina no convergió). Pregunta: ¿qué tienen distinto estos países? Ahorro, población, tecnología/instituciones → los parámetros de Solow.</aside>
+</section>
+
+<!-- ===================== 4. ARGENTINA VS 2% ===================== -->
+<section class="slide" data-sec="1 · La gran pregunta">
+  <div class="kicker">1 · El caso argentino</div>
+  <h2>Argentina vs. la Argentina que creció al <span class="c-acc" id="arg-gtitle">2%</span></h2>
+  <div class="cols" style="grid-template-columns:1.35fr .65fr;gap:28px">
+    <div class="graphbox"><svg id="g-arg" viewBox="0 0 760 410" width="100%"></svg></div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card" style="padding:14px 18px">
+        <p class="small muted" style="font-size:15px">PIB per cápita 2025 (US$ de 2015)</p>
+        <p style="margin-top:6px"><span class="c-dep" style="font-weight:700">Argentina real:</span> <span class="m" style="font-size:26px" id="arg-real"></span></p>
+        <p data-f="1"><span class="c-acc" style="font-weight:700">Con <span id="arg-g2"></span> anual:</span> <span class="m" style="font-size:26px" id="arg-cf"></span></p>
+        <div data-f="1" style="display:flex;align-items:baseline;gap:10px;margin-top:6px"><span class="big" id="arg-x" style="font-size:56px"></span><span class="small">más rica<br>por persona</span></div>
+      </div>
+      <div class="card" data-f="1" style="padding:12px 20px">
+        <p class="small muted">Tasa contrafáctica desde 1960</p>
+        <div style="display:flex;align-items:center;gap:12px"><input type="range" id="arg-g" min="0.5" max="3.5" step="0.1" value="2"><span class="m" id="arg-gv" style="font-size:22px;width:60px"></span></div>
+      </div>
+      <div class="callout" data-f="2" style="padding:10px 16px"><p class="small">Promedio 1960–2025:<br><b>Argentina ≈ <span id="arg-avg"></span>%</b> anual · <b>EE.UU. ≈ <span id="usa-avg"></span>%</b></p></div>
+    </div>
+  </div>
+  <p class="muted" style="margin-top:6px;font-size:12px">Fuente: Banco Mundial, World Development Indicators — PIB per cápita (US$ constantes de 2015), serie NY.GDP.PCAP.KD, 1960–2025.</p>
+  <aside class="notes">Primero mostrar sólo la serie real (con sus crisis: 1975–76, 1981–82, hiperinflación 1989–90, 2001–02, 2018–20). Avanzar: aparece la Argentina contrafáctica creciendo al 2% (≈ el promedio de EE.UU.) — hoy tendría ~el doble de ingreso por persona. Avanzar otra vez: los promedios de crecimiento (EE.UU. creció ≈2% per cápita por año). Mover el slider: con 3% sería ~3 veces más rica. Pregunta: ¿qué determina esa tasa? → Solow.</aside>
+</section>
+
+<!-- ===================== 5. HISTORIA ===================== -->
+<section class="slide" data-sec="2 · Cómo nace Solow">
+  <div class="kicker">2 · Un poco de historia</div>
+  <h2>Cómo nace el modelo</h2>
+  <div class="timeline">
+    <div class="tl" data-f="1"><div class="yr">1939–46</div><div class="who">Harrod y Domar</div><p>Modelos con proporción capital/producto <b>fija</b>. El crecimiento equilibrado es un “filo de navaja”: cualquier desvío se amplifica.</p></div>
+    <div class="tl key" data-f="2"><div class="yr">1956</div><div class="who">Solow (y Swan, en paralelo)</div><p>Permite <b>sustituir</b> capital por trabajo con <b>rendimientos decrecientes</b> → la economía converge a un <b>estado estacionario estable</b>.</p></div>
+    <div class="tl" data-f="3"><div class="yr">1957</div><div class="who">Solow</div><p>Contabilidad del crecimiento para EE.UU.: la mayor parte del crecimiento del producto por hora no se explica por <i class="v">K</i> → <b>residuo</b> = tecnología.</p></div>
+    <div class="tl" data-f="4"><div class="yr">1987</div><div class="who">Premio Nobel</div><p>Solow lo recibe por sus contribuciones a la teoría del crecimiento económico.</p></div>
+    <div class="tl" data-f="5"><div class="yr">fines ’80</div><div class="who">Romer, Lucas</div><p><b>Crecimiento endógeno</b>: intentan explicar dentro del modelo lo que Solow deja afuera (la tecnología).</p></div>
+  </div>
+  <div class="callout" style="margin-top:34px" data-f="2">
+    <p>Idea clave de Solow: <b>rendimientos decrecientes del capital</b>. Cada máquina adicional por trabajador agrega cada vez menos producto → la acumulación de capital, por sí sola, <b>se frena</b>.</p>
+  </div>
+  <aside class="notes">No hace falta detenerse mucho. Lo importante: Harrod–Domar = inestable; Solow introduce rendimientos decrecientes y eso da estabilidad (convergencia). Ese es el corazón de todo lo que sigue.</aside>
+</section>
+
+<!-- ===================== QUÉ ES ===================== -->
+<section class="slide" data-sec="2 · Qué es el modelo">
+  <div class="kicker">2 · ¿Qué es el modelo de Solow?</div>
+  <h2>El modelo en una frase</h2>
+  <div class="card" style="border-left:6px solid var(--accent);padding:22px 30px">
+    <p style="font-size:23px;line-height:1.42">Es un <b>modelo de crecimiento económico de largo plazo</b> que explica cómo el <b class="c-inv">ahorro</b>, el <b class="c-dep">crecimiento de la población</b> y la <b class="c-prod">tecnología</b> determinan cuánto <b>capital por trabajador</b> tiene una economía y, con eso, su <b>nivel de vida</b>.</p>
+    <div style="margin-top:12px"><span class="chip">dinámico: período a período</span><span class="chip">neoclásico</span><span class="chip">crecimiento exógeno</span><span class="chip">base de la macro moderna</span></div>
+  </div>
+  <h3 style="font-family:var(--serif);font-size:24px;margin:16px 0 10px">¿Para qué se usa?</h3>
+  <div class="grid4 compact">
+    <div class="card" data-f="1"><div class="icon bg-prod">📈</div><h3>Pronosticar crecimiento</h3><p>Si sabemos qué tan lejos está un país de su estado estacionario, anticipamos si va a crecer rápido o lento. Es la base de cómo se estima el <b>PIB potencial</b>.</p></div>
+    <div class="card" data-f="2"><div class="icon bg-inv">🌍</div><h3>Comparar países</h3><p>Explica por qué unos países son más ricos que otros: distinto ahorro, crecimiento poblacional o tecnología.</p></div>
+    <div class="card" data-f="3"><div class="icon bg-cons">🏛</div><h3>Evaluar políticas</h3><p>¿Qué pasa si se incentiva el ahorro y la inversión? ¿Y si cae la natalidad? ¿Cambia el nivel o la tasa de crecimiento?</p></div>
+    <div class="card" data-f="4"><div class="icon bg-dep">🧱</div><h3>Punto de partida</h3><p>Los modelos que usan hoy los bancos centrales son, en el fondo, Solow + decisiones óptimas de ahorro y trabajo.</p></div>
+  </div>
+  <aside class="notes">Slide de “qué es”: la frase resume todo el modelo. Exógeno = s, n y la tecnología vienen dados, el modelo no los explica. Usos: (1) proyecciones de largo plazo / PIB potencial con el enfoque de función de producción; (2) diferencias entre países; (3) políticas: efecto nivel vs. efecto crecimiento; (4) es la base de los modelos de crecimiento neoclásico con optimización (Ramsey–Cass–Koopmans, ciclos reales, DSGE).</aside>
+</section>
+
+<!-- ===================== 6. QUÉ HACE ===================== -->
+<section class="slide" data-sec="3 · El modelo">
+  <div class="kicker">3 · ¿Qué hace el modelo?</div>
+  <h2>Una máquina de transformar ahorro en capital</h2>
+  <div class="cols wide-r">
+    <div>
+      <p>Seguimos <b>período a período</b> cómo evoluciona el capital y, con él, el producto, el consumo y la inversión.</p>
+      <ul class="clean" style="margin-top:12px">
+        <li data-f="1">Se <b>produce</b> con capital y trabajo.</li>
+        <li data-f="2">Se <b>ahorra</b> una fracción fija <i class="v">s</i> del producto; el resto se consume.</li>
+        <li data-f="3">El ahorro se <b>invierte</b>: se suma al capital de mañana.</li>
+        <li data-f="4">Parte del capital se <b>gasta</b> (<i class="v">δ</i>) y la población <b>crece</b> (<i class="v">n</i>).</li>
+      </ul>
+      <div class="callout" style="margin-top:18px" data-f="5"><p>Pregunta central: <b>¿a dónde converge</b> esta economía y <b>qué determina</b> su nivel de vida de largo plazo?</p></div>
+    </div>
+    <div class="graphbox" style="display:flex;align-items:center;justify-content:center">
+      <svg viewBox="0 0 600 470" width="100%">
+        <defs>
+          <marker id="ah1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--muted)"/></marker>
+        </defs>
+        <!-- nodes -->
+        <g data-f="1">
+          <rect x="190" y="20" width="220" height="74" rx="16" fill="color-mix(in srgb,var(--prod) 14%,var(--surface))" stroke="var(--prod)" stroke-width="2"/>
+          <text x="300" y="50" text-anchor="middle" font-family="Inter" font-weight="700" font-size="17" fill="var(--prod)">PRODUCCIÓN</text>
+          <text x="300" y="78" text-anchor="middle" font-size="21" font-style="italic">Y = A K<tspan dy="-8" font-size="13">α</tspan><tspan dy="8"> N</tspan><tspan dy="-8" font-size="13">1−α</tspan></text>
+        </g>
+        <g data-f="2">
+          <rect x="380" y="200" width="212" height="74" rx="16" fill="color-mix(in srgb,var(--inv) 14%,var(--surface))" stroke="var(--inv)" stroke-width="2"/>
+          <text x="486" y="230" text-anchor="middle" font-family="Inter" font-weight="700" font-size="16" fill="var(--inv)">AHORRO = INVERSIÓN</text>
+          <text x="486" y="258" text-anchor="middle" font-size="21" font-style="italic">I = S = sY</text>
+          <path class="flow" d="M380,94 Q470,130 485,196" fill="none" stroke="var(--muted)" stroke-width="2.5" marker-end="url(#ah1)"/>
+          <rect x="40" y="200" width="160" height="74" rx="16" fill="color-mix(in srgb,var(--cons) 16%,var(--surface))" stroke="var(--cons)" stroke-width="2"/>
+          <text x="120" y="230" text-anchor="middle" font-family="Inter" font-weight="700" font-size="17" fill="var(--cons)">CONSUMO</text>
+          <text x="120" y="258" text-anchor="middle" font-size="21" font-style="italic">C = (1−s)Y</text>
+          <path class="flow" d="M220,94 Q140,130 125,196" fill="none" stroke="var(--muted)" stroke-width="2.5" marker-end="url(#ah1)"/>
+        </g>
+        <g data-f="3">
+          <rect x="190" y="370" width="220" height="74" rx="16" fill="var(--surface2)" stroke="var(--ink)" stroke-width="2"/>
+          <text x="300" y="400" text-anchor="middle" font-family="Inter" font-weight="700" font-size="17">CAPITAL DE MAÑANA</text>
+          <text x="300" y="428" text-anchor="middle" font-size="21" font-style="italic">K<tspan dy="5" font-size="13">t+1</tspan><tspan dy="-5"> = (1−δ)K</tspan><tspan dy="5" font-size="13">t</tspan><tspan dy="-5"> + I</tspan><tspan dy="5" font-size="13">t</tspan></text>
+          <path class="flow" d="M485,278 Q470,340 414,392" fill="none" stroke="var(--muted)" stroke-width="2.5" marker-end="url(#ah1)"/>
+          <path class="flow" d="M300,366 Q300,230 300,100" fill="none" stroke="var(--prod)" stroke-width="2.5" marker-end="url(#ah1)"/>
+          <text x="290" y="300" text-anchor="end" font-family="Inter" font-size="14" fill="var(--prod)" font-weight="600">más K → más Y</text>
+        </g>
+        <g data-f="4">
+          <path d="M190,425 Q120,440 70,420" fill="none" stroke="var(--dep)" stroke-width="2.5" stroke-dasharray="6 4" marker-end="url(#ah1)"/>
+          <text x="20" y="400" font-family="Inter" font-size="15" fill="var(--dep)" font-weight="600">depreciación δK</text>
+          <text x="20" y="465" font-family="Inter" font-size="15" fill="var(--dep)" font-weight="600">población crece a n</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+  <aside class="notes">Contar el circuito: produzco → una parte la consumo, otra la ahorro → el ahorro se invierte → mañana tengo más capital → produzco más. Pero el capital se deprecia y la población crece, lo que “come” capital por persona. La pregunta es dónde se equilibran estas fuerzas.</aside>
+</section>
+
+<!-- ===================== 7. SUPUESTOS ===================== -->
+<section class="slide" data-sec="3 · El modelo">
+  <div class="kicker">3 · Ingredientes</div>
+  <h2>Los supuestos</h2>
+  <div class="grid4">
+    <div class="card" data-f="1"><div class="icon bg-prod">⚙︎</div><h3>Tecnología</h3><p>Cobb–Douglas <span class="m"><i>Y</i> = <i>AK</i><sup><i>α</i></sup><i>N</i><sup>1−<i>α</i></sup></span>, 0&lt;<i class="v">α</i>&lt;1.<br>Rendimientos <b>constantes a escala</b> y <b>decrecientes</b> en cada factor.</p></div>
+    <div class="card" data-f="2"><div class="icon bg-inv">€</div><h3>Ahorro</h3><p>Se ahorra una <b>fracción fija</b> <i class="v">s</i> del ingreso: <span class="m"><i>S</i> = <i>sY</i></span>.<br>Economía cerrada sin gobierno: <b>ahorro = inversión</b>.</p></div>
+    <div class="card" data-f="3"><div class="icon bg-cons">☺︎</div><h3>Población</h3><p>Todos trabajan y la población crece a tasa <b>exógena</b> <i class="v">n</i>:<br><span class="m"><i>N</i><sub><i>t</i>+1</sub> = (1+<i>n</i>)<i>N<sub>t</sub></i></span>.</p></div>
+    <div class="card" data-f="4"><div class="icon bg-dep">↓</div><h3>Depreciación</h3><p>Cada período se gasta una fracción <i class="v">δ</i> del capital (máquinas que se rompen).</p></div>
+  </div>
+  <div class="callout" style="margin-top:28px" data-f="5">
+    <p><b>El supuesto “mágico” de Solow:</b> en vez de resolver cuánto consumir en infinitos períodos (maximizando <span class="m"><i>U</i> = Σ <i>β<sup>t</sup>u</i>(<i>C<sub>t</sub></i>)</span>, fuera del nivel del curso), asume que se consume una proporción constante: <span class="m"><i>C<sub>t</sub></i> = (1−<i>s</i>)<i>Y<sub>t</sub></i></span>. Con eso, dado <i class="v">K<sub>t</sub></i> sabemos todo.</p>
+  </div>
+  <aside class="notes">Notación: el TP usa δ para la depreciación; en las notas/slides de la teórica aparece como d. Es lo mismo. Remarcar que s, n, δ, A son parámetros (exógenos): el modelo no explica por qué un país ahorra más.</aside>
+</section>
+
+<!-- ===================== 8. ECUACIONES ===================== -->
+<section class="slide" data-sec="3 · El modelo">
+  <div class="kicker">3 · El modelo en ecuaciones (como en el TP)</div>
+  <h2>Seis ecuaciones, una economía</h2>
+  <div class="cols">
+    <div class="card" style="display:flex;flex-direction:column;justify-content:center;gap:4px">
+      <div class="eq sm left"><i>Y<sub>t</sub></i> = <i>C<sub>t</sub></i> + <i>I<sub>t</sub></i> <span class="lbl bg-cons">uso del producto</span></div>
+      <div class="eq sm left"><i>Y<sub>t</sub></i> = <i>AK<sub>t</sub></i><sup><i>α</i></sup><i>N<sub>t</sub></i><sup>1−<i>α</i></sup> <span class="lbl bg-prod">producción</span></div>
+      <div class="eq sm left"><i>K</i><sub><i>t</i>+1</sub> = (1−<i>δ</i>)<i>K<sub>t</sub></i> + <i>I<sub>t</sub></i> <span class="lbl bg-inv">ley de mov. del capital</span></div>
+      <div class="eq sm left"><i>N</i><sub><i>t</i>+1</sub> = (1+<i>n</i>)<i>N<sub>t</sub></i> <span class="lbl bg-dep">población</span></div>
+      <div class="eq sm left"><i>C<sub>t</sub></i> + <i>S<sub>t</sub></i> = <i>Y<sub>t</sub></i> <span class="lbl bg-cons">restricción presup.</span></div>
+      <div class="eq sm left"><i>S<sub>t</sub></i> = <i>sY<sub>t</sub></i> <span class="lbl bg-inv">regla de ahorro</span></div>
+      <p class="small muted" style="margin-top:6px">Dados <i class="v">K</i><sub>0</sub> y <i class="v">N</i><sub>0</sub>.</p>
+    </div>
+    <div>
+      <p style="font-weight:650;margin-bottom:10px">Paso a paso: del modelo agregado al per cápita</p>
+      <ol class="steps">
+        <li data-f="1"><b>Dividir cada ecuación por <i class="v">N<sub>t</sub></i></b> y llamar con minúscula a las variables per cápita: <span class="m"><i>y</i> = <i>Y</i>/<i>N</i>, <i>k</i> = <i>K</i>/<i>N</i>, …</span></li>
+        <li data-f="2"><b>Producción:</b> por rendimientos constantes a escala, <span class="m"><i>y<sub>t</sub></i> = <i>Ak<sub>t</sub></i><sup><i>α</i></sup></span>.</li>
+        <li data-f="3"><b>Capital:</b> usar <span class="m"><i>N</i><sub><i>t</i>+1</sub> = (1+<i>n</i>)<i>N<sub>t</sub></i></span> → <span class="m">(1+<i>n</i>)<i>k</i><sub><i>t</i>+1</sub> = (1−<i>δ</i>)<i>k<sub>t</sub></i> + <i>i<sub>t</sub></i></span>.</li>
+        <li data-f="4"><b>Consumo:</b> juntar restricción presupuestaria y regla de ahorro → <span class="m"><i>c<sub>t</sub></i> = (1−<i>s</i>)<i>y<sub>t</sub></i></span>.</li>
+      </ol>
+      <div class="callout" data-f="5" style="margin-top:14px;padding:12px 20px">
+        <p class="small" style="margin-bottom:2px"><b>Resultado: 4 ecuaciones en <i class="v">y</i>, <i class="v">c</i>, <i class="v">i</i>, <i class="v">k</i></b></p>
+        <div class="eq" style="font-size:24px;margin:4px 0;line-height:1.6"><i>y<sub>t</sub></i> = <i>c<sub>t</sub></i> + <i>i<sub>t</sub></i> &nbsp;·&nbsp; <i>y<sub>t</sub></i> = <i>Ak<sub>t</sub></i><sup><i>α</i></sup><br>(1+<i>n</i>)<i>k</i><sub><i>t</i>+1</sub> = (1−<i>δ</i>)<i>k<sub>t</sub></i> + <i>i<sub>t</sub></i> &nbsp;·&nbsp; <i>c<sub>t</sub></i> = (1−<i>s</i>)<i>y<sub>t</sub></i></div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Estas son exactamente las ecuaciones (1)–(6) del Ejercicio 1 (ojo: la consigna tiene la errata 1−n en la ecuación 4; es 1+n). El paso a paso es el inciso 1: se puede mostrar acá como hoja de ruta o dejarlo para el pizarrón. Las dos slides que siguen desarrollan los pasos 2 y 3.</aside>
+</section>
+
+<!-- ===================== 9. PER CÁPITA ===================== -->
+<section class="slide" data-sec="3 · El modelo">
+  <div class="kicker">3 · Pasar a per cápita</div>
+  <h2>La función de producción per cápita</h2>
+  <div class="cols">
+    <div>
+      <p>Dividimos la producción por <i class="v">N<sub>t</sub></i> y usamos rendimientos constantes a escala:</p>
+      <div class="eq" data-f="1"><i>y<sub>t</sub></i> = <span class="frac"><span><i>AK<sub>t</sub></i><sup><i>α</i></sup><i>N<sub>t</sub></i><sup>1−<i>α</i></sup></span><span><i>N<sub>t</sub></i></span></span> = <i>A</i><span class="par">(</span><span class="frac"><span><i>K<sub>t</sub></i></span><span><i>N<sub>t</sub></i></span></span><span class="par">)</span><sup><i>α</i></sup></div>
+      <div class="eq" data-f="2" style="font-size:44px"><span style="background:var(--accent-soft);padding:4px 18px;border-radius:12px"><i>y<sub>t</sub></i> = <i>A k<sub>t</sub></i><sup><i>α</i></sup></span></div>
+      <p data-f="3">El producto por persona depende <b>sólo</b> del capital por persona.</p>
+      <div class="eq sm" data-f="4" style="margin-top:18px"><i>c<sub>t</sub></i> = (1−<i>s</i>)<i>y<sub>t</sub></i> &nbsp;&nbsp;·&nbsp;&nbsp; <i>i<sub>t</sub></i> = <i>s y<sub>t</sub></i> &nbsp;&nbsp;·&nbsp;&nbsp; <i>y<sub>t</sub></i> = <i>c<sub>t</sub></i> + <i>i<sub>t</sub></i></div>
+    </div>
+    <div class="graphbox" data-f="3">
+      <svg id="g-percap" viewBox="0 0 560 420" width="100%"></svg>
+      <p class="small muted" style="padding:0 14px 8px">Rendimientos <b>decrecientes</b>: el mismo Δ<i class="v">k</i> agrega cada vez menos Δ<i class="v">y</i>.</p>
+    </div>
+  </div>
+  <aside class="notes">Mostrar la curva cóncava: con poco capital por persona, una máquina más rinde muchísimo; con mucho, rinde poco. Esa concavidad es la que va a garantizar la convergencia. El detalle algebraico (dividir cada ecuación por N) lo hacemos en el inciso 1.</aside>
+</section>
+
+<!-- ===================== 10. LEY DE MOVIMIENTO ===================== -->
+<section class="slide" data-sec="3 · El modelo">
+  <div class="kicker">3 · El capital por persona</div>
+  <h2>¿Cómo evoluciona <i class="v">k</i>?</h2>
+  <div class="cols wide-l">
+    <div>
+      <p>Dividimos la ley de movimiento del capital por <i class="v">N<sub>t</sub></i> y usamos <span class="m"><i>N</i><sub><i>t</i>+1</sub>/<i>N<sub>t</sub></i> = 1+<i>n</i></span>:</p>
+      <div class="eq sm" data-f="1"><i>K</i><sub><i>t</i>+1</sub> = (1−<i>δ</i>)<i>K<sub>t</sub></i> + <i>I<sub>t</sub></i> &nbsp;&nbsp;⟹&nbsp;&nbsp; <span style="background:var(--accent-soft);padding:2px 12px;border-radius:10px">(1+<i>n</i>)<i>k</i><sub><i>t</i>+1</sub> = (1−<i>δ</i>)<i>k<sub>t</sub></i> + <i>i<sub>t</sub></i></span></div>
+      <p data-f="2" style="margin-top:14px">Reordenando (y despreciando el término chico <i class="v">n</i>·Δ<i class="v">k</i>):</p>
+      <div class="eq" data-f="2" style="font-size:40px"><i>k</i><sub><i>t</i>+1</sub> − <i>k<sub>t</sub></i> ≈ <span class="c-inv"><i>i<sub>t</sub></i></span> − <span class="c-dep">(<i>n</i> + <i>δ</i>)<i>k<sub>t</sub></i></span></div>
+    </div>
+    <div>
+      <div class="card" data-f="3">
+        <h3>¿Por qué aparece <i class="v">n</i> como si fuera depreciación?</h3>
+        <p>Aunque no se rompa ninguna máquina (<i class="v">δ</i> = 0), si la población crece y no invierto, tengo <b>las mismas máquinas para más gente</b>: el capital por persona cae.</p>
+        <p style="margin-top:10px">El crecimiento de la población <b>“diluye”</b> el capital per cápita.</p>
+      </div>
+      <div class="card" data-f="4" style="margin-top:16px">
+        <p>Para que <i class="v">k</i> no caiga hay que invertir <span class="m c-dep">(<i>n</i>+<i>δ</i>)<i>k</i></span>: reponer lo depreciado <b>y</b> equipar a los nuevos trabajadores → <b>depreciación per cápita</b>.</p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">En el TP la solución trabaja con la versión exacta (1+n)k_{t+1} = (1−δ)k_t + i_t. En estado estacionario no hace falta aproximar: con k_{t+1}=k_t=k queda (n+δ)k = i exacto. La aproximación solo sirve para la intuición de Δk.</aside>
+</section>
+
+<!-- ===================== 11. ECUACIÓN FUNDAMENTAL ===================== -->
+<section class="slide" data-sec="3 · El modelo">
+  <div class="kicker">3 · La ecuación fundamental de Solow</div>
+  <h2>Un tira y afloja entre dos fuerzas</h2>
+  <div class="eq" style="font-size:52px;margin:26px 0 30px">
+    Δ<i>k<sub>t</sub></i> = <span class="c-inv"><i>s A k<sub>t</sub></i><sup><i>α</i></sup></span> − <span class="c-dep">(<i>n</i> + <i>δ</i>)<i>k<sub>t</sub></i></span>
+  </div>
+  <div class="grid2" style="gap:26px">
+    <div class="card" style="border-top:5px solid var(--inv)"><h3 class="c-inv">Inversión per cápita</h3><p>Lo que <b>agrego</b> de capital por persona: una fracción <i class="v">s</i> de lo que produzco. Crece con <i class="v">k</i>, pero <b>cada vez menos</b> (cóncava).</p></div>
+    <div class="card" style="border-top:5px solid var(--dep)"><h3 class="c-dep">Depreciación per cápita</h3><p>Lo que <b>necesito</b> invertir para que <i class="v">k</i> no caiga. Crece con <i class="v">k</i> <b>proporcionalmente</b> (recta).</p></div>
+  </div>
+  <div class="grid4" style="grid-template-columns:repeat(3,1fr);margin-top:22px">
+    <div class="card" data-f="1"><p><span class="c-inv"><b>Inversión</b></span> &gt; <span class="c-dep"><b>depreciación</b></span><br>⟹ Δ<i class="v">k</i> &gt; 0: <b>el capital per cápita crece</b></p></div>
+    <div class="card" data-f="2"><p><span class="c-inv"><b>Inversión</b></span> &lt; <span class="c-dep"><b>depreciación</b></span><br>⟹ Δ<i class="v">k</i> &lt; 0: <b>el capital per cápita cae</b></p></div>
+    <div class="card" data-f="3" style="background:var(--accent-soft)"><p><span class="c-inv"><b>Inversión</b></span> = <span class="c-dep"><b>depreciación</b></span><br>⟹ Δ<i class="v">k</i> = 0: <b>estado estacionario</b> <i class="v">k</i>*</p></div>
+  </div>
+  <aside class="notes">Esta es LA ecuación del modelo. Sale de juntar i = s y = s A k^α con la ley de movimiento. Todo lo que sigue (gráfico, estado estacionario, estática comparada) es mirar esta ecuación.</aside>
+</section>
+
+<!-- ===================== 13. ESTADO ESTACIONARIO ===================== -->
+<section class="slide" data-sec="4 · Estado estacionario">
+  <div class="kicker">4 · Estado estacionario · la idea</div>
+  <h2>¿Qué es el estado estacionario?</h2>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:30px">
+    <div>
+      <div class="card" style="border-left:6px solid var(--accent)"><p style="font-size:21px">Es el <b>punto de reposo</b> de la economía: el capital por trabajador <i class="v">k</i>* en el que la <b class="c-inv">inversión</b> alcanza <b>justo</b> para cubrir la <b class="c-dep">depreciación per cápita</b> (lo que se deprecia + equipar a los nuevos trabajadores).</p></div>
+      <p data-f="1" style="margin-top:16px;font-size:21px"><b>Pensalo como una bañadera:</b></p>
+      <ul class="clean" style="margin-top:2px">
+        <li data-f="1" style="font-size:19px">El <b>nivel del agua</b> es el capital por trabajador <i class="v">k</i>.</li>
+        <li data-f="1" style="font-size:19px">La <b class="c-inv">canilla</b> es la inversión <span class="m"><i>sAk</i><sup><i>α</i></sup></span>.</li>
+        <li data-f="1" style="font-size:19px">El <b class="c-dep">desagüe</b> es la depreciación per cápita <span class="m">(<i>n</i>+<i>δ</i>)<i>k</i></span>: cuanta más agua, más se va.</li>
+        <li data-f="2" style="font-size:19px">Si entra más de lo que sale, el nivel <b>sube</b>; si sale más, <b>baja</b>. Cuando <b>entra = sale</b>, el nivel queda <b>quieto</b>: eso es <i class="v">k</i>*.</li>
+      </ul>
+    </div>
+    <div class="graphbox" style="display:flex;flex-direction:column">
+      <svg id="g-tub" viewBox="0 0 540 380" width="100%"></svg>
+      <div style="display:flex;gap:6px;padding:0 10px 6px;flex-wrap:wrap;align-items:center">
+        <button class="btn" id="tub-low">▶ Arrancar con poco capital</button>
+        <button class="btn ghost" id="tub-high">▶ Arrancar con mucho</button>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Usar la animación: con poco capital, la canilla (inversión) es mayor que el desagüe (depreciación per cápita) → el nivel sube, pero a medida que sube el desagüe crece más rápido que la canilla (rendimientos decrecientes) → se frena en k* = 4 (parámetros del TP). Con mucho capital pasa lo contrario. Parámetros: α=0,5; s=0,2; n=δ=0,05; A=1.</aside>
+</section>
+
+<!-- ===================== 12. GRÁFICO ===================== -->
+<section class="slide" data-sec="4 · Estado estacionario">
+  <div class="kicker">4 · El gráfico de Solow</div>
+  <h2>Todo en un solo dibujo</h2>
+  <div class="cols wide-r" style="grid-template-columns:.62fr 1.38fr;gap:28px">
+    <div class="steptext">
+      <div data-f="1"><p><span class="lbl bg-prod" style="margin:0">producto</span><br><i class="v">y</i> = <i class="v">Ak</i><sup><i>α</i></sup>: cóncava.</p></div>
+      <div data-f="2"><p><span class="lbl bg-inv" style="margin:0">inversión</span><br><i class="v">sAk</i><sup><i>α</i></sup>: la misma curva “achicada” por <i class="v">s</i>.</p></div>
+      <div data-f="3"><p><span class="lbl bg-dep" style="margin:0">depreciación per cápita</span><br>(<i class="v">n</i>+<i class="v">δ</i>)<i class="v">k</i>: recta por el origen.</p></div>
+      <div data-f="4"><p>Se cruzan en <b><i class="v">k</i>*</b>: el <b>estado estacionario</b>.</p></div>
+      <div data-f="5"><p>En <i class="v">k</i>*: el <span class="c-cons"><b>consumo</b></span> es la distancia entre <i class="v">y</i> e <i class="v">i</i>.</p></div>
+      <div data-f="6"><p>Si <i class="v">k</i> &lt; <i class="v">k</i>*: inversión &gt; depreciación → <i class="v">k</i> <b>sube</b>…</p></div>
+      <div data-f="7"><p>…y si <i class="v">k</i> &gt; <i class="v">k</i>*: <i class="v">k</i> <b>baja</b>. <i class="v">k</i>* es <b>estable</b>.</p></div>
+    </div>
+    <div class="graphbox"><svg id="g-solow" viewBox="0 0 760 520" width="100%"></svg></div>
+  </div>
+  <aside class="notes">Ir revelando de a una. Remarcar que la distancia vertical entre la curva verde y la recta roja es justamente Δk. Mientras haya brecha positiva, k sigue subiendo, pero la brecha se achica → crece cada vez más lento. (k=0 también es EE, pero trivial: una economía sin capital.)</aside>
+</section>
+
+<section class="slide" data-sec="4 · Estado estacionario">
+  <div class="kicker">4 · Estado estacionario · qué nos dice</div>
+  <h2>¿Qué nos dice el estado estacionario?</h2>
+  <div class="cols" style="grid-template-columns:1.05fr .95fr;gap:30px">
+    <div>
+      <p><b>Definición:</b> <span class="m"><i>k</i>* = <i>k<sub>t</sub></i> = <i>k</i><sub><i>t</i>+1</sub> = …</span> &nbsp;⟺&nbsp; Δ<i class="v">k</i> = 0</p>
+      <div class="eq" style="font-size:38px;margin:14px 0 18px"><span class="c-inv"><i>sA</i>(<i>k</i>*)<sup><i>α</i></sup></span> = <span class="c-dep">(<i>n</i>+<i>δ</i>)<i>k</i>*</span></div>
+      <ol class="steps">
+        <li data-f="1"><b>Depende sólo de los parámetros</b> (<i class="v">s</i>, <i class="v">A</i>, <i class="v">n</i>, <i class="v">δ</i>, <i class="v">α</i>), <b>no de dónde arranca</b> la economía: dos países con los mismos parámetros terminan con el mismo nivel de vida.</li>
+        <li data-f="2"><b>Es estable:</b> desde cualquier <i class="v">k</i><sub>0</sub> &gt; 0 la economía converge a <i class="v">k</i>*. Cuanto más lejos está, más rápido crece.</li>
+        <li data-f="3"><b>El nivel de vida se estanca:</b> en el largo plazo, ahorrar más sube el <b>nivel</b> de ingreso, pero no la <b>tasa</b> de crecimiento.</li>
+      </ol>
+    </div>
+    <div>
+      <div class="card" data-f="4" style="padding:16px 22px">
+        <h3>¿A qué tasa crece cada cosa en EE?</h3>
+        <table class="m" style="width:100%;border-collapse:collapse;font-size:21px;margin-top:6px">
+          <tr style="border-bottom:2px solid var(--line);font-family:var(--sans);font-size:14px;color:var(--muted)"><th style="text-align:left;padding:6px 4px">Variables</th><th style="text-align:right;padding:6px 4px">Tasa</th></tr>
+          <tr style="border-bottom:1px solid var(--line)"><td style="padding:8px 4px">per cápita: <i>k, y, c, i</i></td><td style="text-align:right;font-weight:600">0%</td></tr>
+          <tr style="border-bottom:1px solid var(--line)"><td style="padding:8px 4px">población: <i>N</i></td><td style="text-align:right;font-weight:600"><i>n</i></td></tr>
+          <tr><td style="padding:8px 4px">agregadas: <i>K, Y, C, I</i></td><td style="text-align:right;font-weight:600"><i>n</i></td></tr>
+        </table>
+        <p class="small muted" style="margin-top:8px">Porque <span class="m"><i>K</i> = <i>k</i>·<i>N</i></span>: tasa agregada ≈ tasa per cápita + <i class="v">n</i>, &nbsp;<span class="m"><i>g<sub>K</sub></i> ≈ <i>g<sub>k</sub></i> + <i>n</i></span>.</p>
+      </div>
+      <div class="callout" data-f="5" style="margin-top:16px"><p>Despejando de la condición se obtienen <i class="v">k</i>*, <i class="v">y</i>*, <i class="v">c</i>*, <i class="v">i</i>* en función de los parámetros.<br><b>→ Lo hacemos juntos en el inciso 2.</b></p></div>
+    </div>
+  </div>
+  <aside class="notes">Tres mensajes: (1) EE determinado por parámetros, no por k0 → convergencia condicional; (2) estable; (3) en EE no hay crecimiento per cápita. La tabla es clave para el inciso 4: g_K ≈ g_k + n. No derivar k* acá: es el inciso 2.</aside>
+</section>
+
+<!-- ===================== 14. LABORATORIO ===================== -->
+<section class="slide" data-sec="4 · Estado estacionario">
+  <div class="kicker">4 · Laboratorio · estática comparada</div>
+  <h2>¿Qué pasa si cambian los parámetros?</h2>
+  <div class="cols" style="grid-template-columns:1.3fr .7fr;gap:26px">
+    <div class="graphbox"><svg id="g-lab" viewBox="0 0 760 500" width="100%"></svg></div>
+    <div>
+      <div class="ctrl"><label>ahorro <i>s</i></label><input type="range" id="lab-s" min="0.05" max="0.6" step="0.01" value="0.2"><output id="o-s"></output></div>
+      <div class="ctrl"><label>tecnología <i>A</i></label><input type="range" id="lab-A" min="0.5" max="1.5" step="0.01" value="1"><output id="o-A"></output></div>
+      <div class="ctrl"><label>pobl. <i>n</i></label><input type="range" id="lab-n" min="0.01" max="0.1" step="0.005" value="0.05"><output id="o-n"></output></div>
+      <div class="ctrl"><label>deprec. <i>δ</i></label><input type="range" id="lab-d" min="0.01" max="0.15" step="0.005" value="0.05"><output id="o-d"></output></div>
+      <div class="ctrl"><label>capital <i>α</i></label><input type="range" id="lab-a" min="0.2" max="0.7" step="0.01" value="0.5"><output id="o-a"></output></div>
+      <div class="readout">
+        <div><div class="v c-acc" id="r-k"></div><div class="k">k*</div></div>
+        <div><div class="v c-prod" id="r-y"></div><div class="k">y*</div></div>
+        <div><div class="v c-cons" id="r-c"></div><div class="k">c*</div></div>
+        <div><div class="v c-inv" id="r-i"></div><div class="k">i*</div></div>
+      </div>
+      <div style="margin-top:10px">
+        <button class="btn" id="lab-anim">▶ Ver transición</button>
+        <button class="btn ghost" id="lab-base">Fijar como base</button>
+        <button class="btn ghost" id="lab-reset">Valores del TP</button>
+      </div>
+      <p class="hint" id="lab-hint"></p>
+    </div>
+  </div>
+  <aside class="notes">Arranca con los parámetros del inciso 4 del TP (α=0,5; s=0,2; n=δ=0,05; A=1 → k*=4). Probar: subir s, subir n o δ, subir A. La curva punteada tenue es la “base”; “Ver transición” anima el camino de k desde el EE viejo al nuevo. Para c*: subir s aumenta c* sólo si s&lt;α (regla de oro). Si quieren no “spoilear” el inciso 3, usar sólo s y n.</aside>
+</section>
+
+<!-- ===================== 15. TRANSICIÓN ===================== -->
+<section class="slide" data-sec="4 · Estado estacionario">
+  <div class="kicker">4 · Dinámica de transición</div>
+  <h2>Convergencia: cuanto más lejos, más rápido</h2>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:26px;flex:none">
+    <div class="graphbox"><svg id="g-path" viewBox="0 0 560 270" width="100%"></svg></div>
+    <div class="graphbox"><svg id="g-growth" viewBox="0 0 560 270" width="100%"></svg></div>
+  </div>
+  <div class="cols" style="grid-template-columns:1fr 1fr;gap:26px;margin-top:14px;flex:none">
+    <div>
+      <div class="ctrl" style="grid-template-columns:190px 1fr 60px"><label>capital inicial <i>k</i><sub>0</sub></label><input type="range" id="k0" min="0.3" max="9" step="0.01" value="1"><output id="o-k0"></output></div>
+      <p class="small muted">Parámetros del TP: <i class="v">α</i>=0,5 · <i class="v">s</i>=0,2 · <i class="v">n</i>=<i class="v">δ</i>=0,05 · <i class="v">A</i>=1 → <i class="v">k</i>* = 4</p>
+    </div>
+    <div class="callout" style="padding:12px 18px"><p class="small" id="path-read"></p></div>
+  </div>
+  <aside class="notes">Mover k0: con k0 bajo, la tasa de crecimiento de k arranca alta y cae a medida que se acerca a k*. Las agregadas crecen a g_k + n (aprox.), así que durante la transición desde abajo crecen MÁS que n, y convergen a n. Ejemplo clásico: Alemania y Japón después de la Segunda Guerra (perdieron capital → k0 muy por debajo de k* → crecieron muy rápido). No mostrar el caso k0=3,98 hasta hacer el inciso 4 si se quiere evitar spoiler.</aside>
+</section>
+
+<!-- ===================== 16. PARA QUÉ SE USA ===================== -->
+<section class="slide" data-sec="5 · Usos y límites">
+  <div class="kicker">5 · Predicciones</div>
+  <h2>Lo que Solow nos enseña</h2>
+  <div class="grid4" style="grid-template-columns:repeat(3,1fr)">
+    <div class="card" data-f="1"><h3>Diferencias de ingreso entre países</h3><p>Países que <b>ahorran más</b> (<i class="v">s</i>↑), con <b>mejor tecnología</b> (<i class="v">A</i>↑) o con <b>menor crecimiento poblacional</b> (<i class="v">n</i>↓) tienen un <i class="v">y</i>* más alto.</p></div>
+    <div class="card" data-f="2"><h3>Convergencia condicional</h3><p>Una economía lejos de su <i class="v">k</i>* crece más rápido. Ej.: <b>Alemania y Japón</b> tras la Segunda Guerra: perdieron capital y crecieron muy rápido durante décadas.</p></div>
+    <div class="card" data-f="3"><h3>Pensar políticas</h3><p>Subir <i class="v">s</i> tiene <b>efecto nivel</b> (sube <i class="v">y</i>*) pero <b>no</b> cambia el crecimiento de largo plazo. ¿Y el consumo?</p></div>
+  </div>
+  <div class="callout" style="margin-top:18px" data-f="4">
+    <p><b>Regla de oro:</b> ahorrar más no siempre es mejor. El consumo de estado estacionario <i class="v">c</i>* es máximo cuando <span class="m"><i>s</i> = <i>α</i></span>. Si <i class="v">s</i> &lt; <i class="v">α</i>, subir <i class="v">s</i> aumenta <i class="v">c</i>*; si <i class="v">s</i> &gt; <i class="v">α</i>, lo reduce (se “ahorra demasiado”).</p>
+  </div>
+  <aside class="notes">La regla de oro está en las notas de clase (s^G = α). Sirve para el inciso 3: el efecto de s sobre c* es ambiguo — depende de si s es menor o mayor que α.</aside>
+</section>
+
+<!-- ===================== 17. LÍMITES ===================== -->
+<section class="slide" data-sec="5 · Usos y límites">
+  <div class="kicker">5 · ¿Qué no explica?</div>
+  <h2>Los límites del modelo básico</h2>
+  <div class="cols">
+    <div>
+      <ul class="clean">
+        <li data-f="1">En estado estacionario <b>el ingreso per cápita no crece</b>. Pero en los datos, muchos países crecen sostenidamente hace más de un siglo.</li>
+        <li data-f="2">Los motores son <b>exógenos</b>: <i class="v">s</i>, <i class="v">n</i>, <i class="v">A</i> vienen dados. El modelo no explica por qué un país ahorra o innova más.</li>
+        <li data-f="3">El consumo no se elige <b>optimizando</b>: es una regla fija.</li>
+      </ul>
+    </div>
+    <div>
+      <div class="card" data-f="4" style="border-top:5px solid var(--accent)">
+        <h3>La salida: progreso técnico</h3>
+        <p>Si la tecnología mejora a una tasa <i class="v">g</i>:</p>
+        <div class="eq sm"><i>Y<sub>t</sub></i> = <i>AK<sub>t</sub></i><sup><i>α</i></sup>(<i>X<sub>t</sub>N<sub>t</sub></i>)<sup>1−<i>α</i></sup>, &nbsp; <i>X</i><sub><i>t</i>+1</sub> = (1+<i>g</i>)<i>X<sub>t</sub></i></div>
+        <p>…entonces en el largo plazo <b>el ingreso per cápita crece a <i class="v">g</i></b>.</p>
+        <p class="small muted" style="margin-top:8px">→ Es el Ejercicio 2 del TP. Explicar <i class="v">g</i> es tarea de los modelos de <b>crecimiento endógeno</b>.</p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Moraleja: acumular capital sólo te lleva a un nivel más alto; para crecer para siempre hace falta progreso tecnológico. Esto deja planteado el Ejercicio 2.</aside>
+</section>
+
+<!-- ===================== 18. PARA LLEVARSE ===================== -->
+<section class="slide" data-sec="Resumen">
+  <div class="kicker">Resumen</div>
+  <h2>Tres ideas para llevarse</h2>
+  <div style="display:flex;flex-direction:column;gap:18px;margin-top:6px">
+    <div class="ag" data-f="1"><span class="n">1</span><div><div class="t">Inversión vs. depreciación</div><div class="d" style="font-size:19px">El capital per cápita se mueve según <span class="m">Δ<i>k</i> = <i>sAk</i><sup><i>α</i></sup> − (<i>n</i>+<i>δ</i>)<i>k</i></span>.</div></div></div>
+    <div class="ag" data-f="2"><span class="n">2</span><div><div class="t">Convergencia al estado estacionario</div><div class="d" style="font-size:19px">Por rendimientos decrecientes, la economía converge a <i class="v">k</i>*: per cápita todo queda constante; las agregadas crecen a <i class="v">n</i>.</div></div></div>
+    <div class="ag" data-f="3"><span class="n">3</span><div><div class="t">Niveles vs. crecimiento</div><div class="d" style="font-size:19px"><i class="v">s</i> y <i class="v">A</i> suben el nivel de largo plazo; <i class="v">n</i> y <i class="v">δ</i> lo bajan. El crecimiento per cápita sostenido requiere progreso técnico.</div></div></div>
+  </div>
+  <aside class="notes">Cierre de la parte teórica. Preguntar si hay dudas antes de pasar al ejercicio.</aside>
+</section>
+
+<!-- ===================== 19. EJERCICIO 1 ===================== -->
+<section class="slide" data-sec="6 · Ejercicio 1">
+  <div class="kicker">6 · Manos a la obra</div>
+  <h2>Ejercicio 1 · Modelo de Solow básico</h2>
+  <div class="cols" style="grid-template-columns:.8fr 1.2fr">
+    <div class="card" style="display:flex;flex-direction:column;justify-content:center">
+      <div class="eq sm left" style="margin:6px 0">(1) <i>Y<sub>t</sub></i> = <i>C<sub>t</sub></i> + <i>I<sub>t</sub></i></div>
+      <div class="eq sm left" style="margin:6px 0">(2) <i>Y<sub>t</sub></i> = <i>AK<sub>t</sub></i><sup><i>α</i></sup><i>N<sub>t</sub></i><sup>1−<i>α</i></sup></div>
+      <div class="eq sm left" style="margin:6px 0">(3) <i>K</i><sub><i>t</i>+1</sub> = (1−<i>δ</i>)<i>K<sub>t</sub></i> + <i>I<sub>t</sub></i></div>
+      <div class="eq sm left" style="margin:6px 0">(4) <i>N</i><sub><i>t</i>+1</sub> = (1+<i>n</i>)<i>N<sub>t</sub></i></div>
+      <div class="eq sm left" style="margin:6px 0">(5) <i>C<sub>t</sub></i> + <i>S<sub>t</sub></i> = <i>Y<sub>t</sub></i></div>
+      <div class="eq sm left" style="margin:6px 0">(6) <i>S<sub>t</sub></i> = <i>sY<sub>t</sub></i></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card" data-f="1" style="padding:14px 20px"><p class="small"><span class="chip">Inciso 1</span><b>Per cápita.</b> Dividir cada ecuación por <i class="v">N<sub>t</sub></i>. Llegar a 4 ecuaciones en <i class="v">y</i>, <i class="v">c</i>, <i class="v">i</i>, <i class="v">k</i>.</p></div>
+      <div class="card" data-f="2" style="padding:14px 20px"><p class="small"><span class="chip">Inciso 2</span><b>Estado estacionario.</b> Imponer <i class="v">k</i><sub><i>t</i>+1</sub> = <i class="v">k<sub>t</sub></i> = <i class="v">k</i>*, despejar <i class="v">k</i>* y luego <i class="v">y</i>*, <i class="v">i</i>*, <i class="v">c</i>*.</p></div>
+      <div class="card" data-f="3" style="padding:14px 20px"><p class="small"><span class="chip">Inciso 3</span><b>Estática comparada</b> respecto de <i class="v">α</i>, <i class="v">δ</i>, <i class="v">A</i>, <i class="v">s</i>: mirar las fórmulas (¡y el gráfico!).</p></div>
+      <div class="card" data-f="4" style="padding:14px 20px"><p class="small"><span class="chip">Inciso 4</span><b>Números:</b> <i class="v">α</i>=0,5, <i class="v">s</i>=0,2, <i class="v">δ</i>=<i class="v">n</i>=0,05, <i class="v">A</i>=1, <i class="v">k</i><sub>0</sub>=3,98. ¿Cómo es la transición? ¿A qué tasa crecen las agregadas?</p></div>
+      <p class="small muted" data-f="4">(Ecuación (4) corregida: en la consigna aparece 1−<i class="v">n</i>.)</p>
+    </div>
+  </div>
+  <aside class="notes">A partir de acá, pizarrón. Sugerencia de tiempos: inciso 1 ≈ 12′, inciso 2 ≈ 15′, inciso 3 ≈ 13′, inciso 4 ≈ 10′. Se puede volver al laboratorio y a la slide de transición para chequear los incisos 3 y 4.</aside>
+</section>
+
+<!-- ===================== 20. APÉNDICE ===================== -->
+<section class="slide" data-sec="Apéndice · para chequear">
+  <span class="tag-app">Backup · no mostrar antes</span>
+  <div class="kicker">Apéndice</div>
+  <h2>Resultados para chequear</h2>
+  <div class="cols" style="grid-template-columns:1.05fr .95fr;gap:30px">
+    <div class="card">
+      <div class="eq sm left" style="margin:4px 0"><i>k</i>* = <span class="par">(</span><span class="frac"><span><i>sA</i></span><span><i>n</i>+<i>δ</i></span></span><span class="par">)</span><sup><span class="frac"><span>1</span><span>1−<i>α</i></span></span></sup> <span class="m c-acc" style="float:right;font-size:24px">= 4</span></div>
+      <div class="eq sm left" style="margin:4px 0"><i>y</i>* = <i>A</i><span class="par">(</span><span class="frac"><span><i>sA</i></span><span><i>n</i>+<i>δ</i></span></span><span class="par">)</span><sup><span class="frac"><span><i>α</i></span><span>1−<i>α</i></span></span></sup> <span class="m c-acc" style="float:right;font-size:24px">= 2</span></div>
+      <div class="eq sm left" style="margin:4px 0"><i>i</i>* = (<i>n</i>+<i>δ</i>)<i>k</i>* <span class="m c-acc" style="float:right;font-size:24px">= 0,4</span></div>
+      <div class="eq sm left" style="margin:4px 0"><i>c</i>* = (1−<i>s</i>)<i>y</i>* <span class="m c-acc" style="float:right;font-size:24px">= 1,6</span></div>
+      <p class="small muted" style="margin-top:8px">Inciso 4: <i class="v">k</i><sub>0</sub> = 3,98 &lt; <i class="v">k</i>* = 4 → las variables per cápita crecen (cada vez más lento) hasta el EE; las agregadas crecen a una tasa <b>apenas mayor que <i class="v">n</i> = 5%</b> y convergen a <i class="v">n</i>.</p>
+    </div>
+    <div>
+      <table style="width:100%;border-collapse:collapse;font-size:19px;text-align:center" class="m">
+        <tr style="border-bottom:2px solid var(--line);font-family:var(--sans);font-size:15px;color:var(--muted)"><th style="text-align:left;padding:6px">↑ en…</th><th>k*</th><th>y*</th><th>i*</th><th>c*</th></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="text-align:left;padding:8px"><i>s</i></td><td>↑</td><td>↑</td><td>↑</td><td>↑ si <i>s</i>&lt;<i>α</i><br>↓ si <i>s</i>&gt;<i>α</i></td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="text-align:left;padding:8px"><i>A</i></td><td>↑</td><td>↑</td><td>↑</td><td>↑</td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="text-align:left;padding:8px"><i>δ</i> (o <i>n</i>)</td><td>↓</td><td>↓</td><td>↓</td><td>↓</td></tr>
+        <tr><td style="text-align:left;padding:8px"><i>α</i></td><td colspan="4">↑ todas <b>si <i>sA</i> &gt; <i>n</i>+<i>δ</i></b><br><span style="font-size:15px;font-family:var(--sans);color:var(--muted)">(la base del exponente &gt; 1, como en el inciso 4)</span></td></tr>
+      </table>
+      <div class="callout warn" style="margin-top:14px;padding:10px 16px"><p class="small">La resolución pone “↑” para <i class="v">α</i> sin condición; vale si <span class="m"><i>sA</i>/(<i>n</i>+<i>δ</i>) &gt; 1</span>. Si fuera &lt; 1, <i class="v">k</i>* <b>bajaría</b> al subir <i class="v">α</i>.</p></div>
+    </div>
+  </div>
+  <aside class="notes">Slide de respaldo para vos. Ojo con i*: la resolución lo escribe como (sA)^{1/(1−α)} / (n+δ)^{α/(1−α)}, que es lo mismo que (n+δ)k*.</aside>
+</section>
+
+</div><!-- /deck -->
+
+<div id="footer"><span id="f-sec"></span><span id="f-num"></span></div>
+<div id="nav"><button id="b-prev" aria-label="Anterior">←</button><button id="b-next" aria-label="Siguiente">→</button><button id="b-full" aria-label="Pantalla completa">⛶</button></div>
+<div id="notes"><div class="hd"><span>Notas del docente</span><span id="clock">00:00</span></div><div id="notes-body"></div></div>
+
+<script>
+(() => {
+const NS = 'http://www.w3.org/2000/svg';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const fmt = (x, d = 2) => x.toFixed(d).replace('.', ',');
+
+/* ---------------- Solow math ---------------- */
+const f = (p, k) => p.A * Math.pow(k, p.a);
+const kstar = p => Math.pow(p.s * p.A / (p.n + p.d), 1 / (1 - p.a));
+const nextK = (p, k) => ((1 - p.d) * k + p.s * f(p, k)) / (1 + p.n);
+
+/* ---------------- SVG helpers ---------------- */
+function el(tag, attrs = {}, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function txt(parent, x, y, html, attrs = {}) {
+  const t = el('text', Object.assign({ x, y }, attrs), parent);
+  t.innerHTML = html;
+  return t;
+}
+function frame(svg, o) {
+  // o: {W,H,ml,mr,mt,mb,xmax,ymax,xmin,ymin}
+  const xmin = o.xmin || 0, ymin = o.ymin || 0;
+  const X = v => o.ml + (v - xmin) / (o.xmax - xmin) * (o.W - o.ml - o.mr);
+  const Y = v => o.H - o.mb - (v - ymin) / (o.ymax - ymin) * (o.H - o.mt - o.mb);
+  const id = 'c' + Math.random().toString(36).slice(2, 8);
+  const defs = el('defs', {}, svg);
+  const cp = el('clipPath', { id }, defs);
+  el('rect', { x: o.ml, y: o.mt - 4, width: o.W - o.ml - o.mr + 4, height: o.H - o.mt - o.mb + 4 }, cp);
+  const mk = el('marker', { id: id + 'a', viewBox: '0 0 10 10', refX: 8, refY: 5, markerWidth: 7, markerHeight: 7, orient: 'auto' }, defs);
+  el('path', { d: 'M0,0L10,5L0,10z', fill: 'var(--ink)' }, mk);
+  return { X, Y, clip: `url(#${id})`, arrow: `url(#${id}a)`, o, defs, id };
+}
+function axes(svg, F, xl = 'k', yl = '') {
+  const o = F.o;
+  const g = el('g', {}, svg);
+  el('line', { x1: o.ml, y1: o.H - o.mb, x2: o.W - o.mr + 30, y2: o.H - o.mb, class: 'axis', 'marker-end': F.arrow }, g);
+  el('line', { x1: o.ml, y1: o.H - o.mb, x2: o.ml, y2: o.mt - 14, class: 'axis', 'marker-end': F.arrow }, g);
+  txt(g, o.W - o.mr + 22, o.H - o.mb + 26, `<tspan font-style="italic">${xl}</tspan>`, { 'font-size': 22 });
+  if (yl) txt(g, o.ml - 10, o.mt - 22, yl, { 'font-size': 18, 'text-anchor': 'end' });
+  return g;
+}
+function curve(fn, F, x0, x1, n = 240) {
+  let d = '';
+  for (let i = 0; i <= n; i++) {
+    const x = x0 + (x1 - x0) * i / n;
+    d += (i ? 'L' : 'M') + F.X(x).toFixed(1) + ',' + F.Y(fn(x)).toFixed(1);
+  }
+  return d;
+}
+const sup = s => `<tspan dy="-9" font-size="0.68em">${s}</tspan><tspan dy="9"> </tspan>`;
+
+/* ---------------- cover art ---------------- */
+(function cover() {
+  const p = { a: .4, s: .4, A: 1, n: .05, d: .05 };
+  const F = { X: v => 40 + v / 14 * 480, Y: v => 480 - v / 3.2 * 440 };
+  $('#cv-prod').setAttribute('d', curve(k => f(p, k), F, 0, 14));
+  $('#cv-inv').setAttribute('d', curve(k => p.s * f(p, k), F, 0, 14));
+  $('#cv-dep').setAttribute('d', curve(k => (p.n + p.d) * k, F, 0, 12.5));
+  const ks = kstar(p), x = F.X(ks), y = F.Y((p.n + p.d) * ks);
+  const dot = $('#cv-dot'); dot.setAttribute('cx', x); dot.setAttribute('cy', y);
+  const l = $('#cv-kline'); l.setAttribute('x1', x); l.setAttribute('x2', x); l.setAttribute('y1', y); l.setAttribute('y2', 480);
+  const t = $('#cv-klab'); t.setAttribute('x', x - 12); t.setAttribute('y', 510);
+})();
+
+/* ---------------- rule of 70 ---------------- */
+(function r70() {
+  const s = $('#g70');
+  const upd = () => {
+    const g = +s.value / 100;
+    $('#g70v').textContent = fmt(g * 100, 1) + '%';
+    $('#gB').textContent = fmt(g * 100, 1) + '%';
+    $('#dbl').textContent = Math.round(Math.log(2) / Math.log(1 + g));
+    const a = Math.pow(1.01, 50), b = Math.pow(1 + g, 50), m = Math.max(a, b);
+    $('#barA').style.width = (a / m * 100) + '%';
+    $('#barB').style.width = (b / m * 100) + '%';
+    $('#valA').textContent = '×' + fmt(a, 2);
+    $('#valB').textContent = '×' + fmt(b, b >= 10 ? 1 : 2);
+  };
+  s.addEventListener('input', upd); upd();
+})();
+
+/* ---------------- per capita small graph ---------------- */
+(function percap() {
+  const svg = $('#g-percap');
+  const p = { a: .4, A: 1 };
+  const F = frame(svg, { W: 560, H: 420, ml: 50, mr: 50, mt: 40, mb: 44, xmax: 10, ymax: 3 });
+  axes(svg, F, 'k', '<tspan font-style="italic">y</tspan>');
+  el('path', { d: curve(k => f(p, k), F, 0, 10), fill: 'none', stroke: 'var(--prod)', 'stroke-width': 4, class: 'draw', pathLength: 1 }, svg);
+  txt(svg, F.X(8.2), F.Y(f(p, 10)) - 14, `<tspan font-style="italic">y = Ak</tspan>${sup('α')}`, { 'font-size': 22, fill: 'var(--prod)' });
+  // two equal Δk steps
+  [[1, 2], [7, 8]].forEach(([k1, k2], j) => {
+    const y1 = f(p, k1), y2 = f(p, k2);
+    const c = j ? 'var(--dep)' : 'var(--inv)';
+    el('line', { x1: F.X(k1), y1: F.Y(y1), x2: F.X(k2), y2: F.Y(y1), stroke: c, 'stroke-width': 3 }, svg);
+    el('line', { x1: F.X(k2), y1: F.Y(y1), x2: F.X(k2), y2: F.Y(y2), stroke: c, 'stroke-width': 3 }, svg);
+    el('circle', { cx: F.X(k1), cy: F.Y(y1), r: 5, fill: c }, svg);
+    el('circle', { cx: F.X(k2), cy: F.Y(y2), r: 5, fill: c }, svg);
+    txt(svg, (F.X(k1) + F.X(k2)) / 2, F.Y(y1) + 22, 'Δk', { 'font-size': 16, 'text-anchor': 'middle', fill: c, 'font-style': 'italic' });
+    txt(svg, F.X(k2) + 8, (F.Y(y1) + F.Y(y2)) / 2 + 5, 'Δy = ' + fmt(y2 - y1, 2), { 'font-size': 16, fill: c, 'font-style': 'italic' });
+  });
+  // make the path draw when the graphbox is shown
+  svg.closest('[data-f]').classList.add('drawhost');
+})();
+
+/* ---------------- Solow graph builder ---------------- */
+function solowGraph(svg, p, opts) {
+  const F = frame(svg, { W: 760, H: opts.H || 520, ml: 56, mr: 130, mt: 40, mb: 50, xmax: opts.xmax, ymax: opts.ymax });
+  axes(svg, F, 'k', '');
+  return F;
+}
+
+/* ---------------- stepwise conceptual graph ---------------- */
+(function stepGraph() {
+  const svg = $('#g-solow');
+  const p = { a: .4, s: .35, A: 1, n: .04, d: .06 };
+  const xmax = 12, ymax = 3;
+  const F = solowGraph(svg, p, { xmax, ymax });
+  const nd = p.n + p.d, ks = kstar(p), ys = f(p, ks), is = p.s * ys;
+  const G = (n) => el('g', { 'data-f': n }, svg);
+
+  let g = G(1);
+  el('path', { d: curve(k => f(p, k), F, 0, xmax), fill: 'none', stroke: 'var(--prod)', 'stroke-width': 4, class: 'draw', pathLength: 1, 'clip-path': F.clip }, g);
+  txt(g, F.X(xmax) + 10, F.Y(f(p, xmax)) + 6, `<tspan font-style="italic">Ak</tspan>${sup('α')}`, { 'font-size': 22, fill: 'var(--prod)' });
+
+  g = G(2);
+  el('path', { d: curve(k => p.s * f(p, k), F, 0, xmax), fill: 'none', stroke: 'var(--inv)', 'stroke-width': 4, class: 'draw', pathLength: 1 }, g);
+  txt(g, F.X(xmax) + 10, F.Y(p.s * f(p, xmax)) + 12, `<tspan font-style="italic">sAk</tspan>${sup('α')}`, { 'font-size': 22, fill: 'var(--inv)' });
+
+  g = G(3);
+  const xe = Math.min(xmax, (ymax * .95) / nd);
+  el('path', { d: `M${F.X(0)},${F.Y(0)}L${F.X(xe)},${F.Y(nd * xe)}`, fill: 'none', stroke: 'var(--dep)', 'stroke-width': 4, class: 'draw', pathLength: 1 }, g);
+  txt(g, F.X(xe) + 10, F.Y(nd * xe) + 6, `<tspan font-style="italic">(n+δ)k</tspan>`, { 'font-size': 22, fill: 'var(--dep)' });
+
+  g = G(4);
+  el('line', { x1: F.X(ks), y1: F.Y(is), x2: F.X(ks), y2: F.Y(0), stroke: 'var(--muted)', 'stroke-dasharray': '5 5', 'stroke-width': 1.5 }, g);
+  el('circle', { cx: F.X(ks), cy: F.Y(is), r: 8, fill: 'var(--accent)', class: 'pulse' }, g);
+  txt(g, F.X(ks), F.Y(0) + 30, '<tspan font-style="italic">k*</tspan>', { 'font-size': 22, 'text-anchor': 'middle', 'font-weight': 600 });
+
+  g = G(5);
+  const bx = F.X(ks);
+  el('line', { x1: bx, y1: F.Y(ys) + 4, x2: bx, y2: F.Y(is) - 4, stroke: 'var(--cons)', 'stroke-width': 4 }, g);
+  el('line', { x1: bx - 8, y1: F.Y(ys), x2: bx + 8, y2: F.Y(ys), stroke: 'var(--cons)', 'stroke-width': 3 }, g);
+  el('line', { x1: bx - 8, y1: F.Y(is), x2: bx + 8, y2: F.Y(is), stroke: 'var(--cons)', 'stroke-width': 3 }, g);
+  txt(g, bx - 14, (F.Y(ys) + F.Y(is)) / 2 + 6, '<tspan font-style="italic">c*</tspan>', { 'font-size': 22, fill: 'var(--cons)', 'text-anchor': 'end', 'font-weight': 600 });
+  el('line', { x1: bx + 14, y1: F.Y(is), x2: bx + 14, y2: F.Y(0) - 2, stroke: 'var(--inv)', 'stroke-width': 3, 'stroke-dasharray': '2 4' }, g);
+  txt(g, bx + 22, (F.Y(is) + F.Y(0)) / 2, '<tspan font-style="italic">i*</tspan>', { 'font-size': 22, fill: 'var(--inv)', 'font-weight': 600 });
+  el('circle', { cx: bx, cy: F.Y(ys), r: 6, fill: 'var(--prod)' }, g);
+  txt(g, bx + 10, F.Y(ys) - 10, '<tspan font-style="italic">y*</tspan>', { 'font-size': 22, fill: 'var(--prod)', 'font-weight': 600 });
+
+  g = G(6);
+  [1.4, 3.4, 5.6].forEach((k, j) => {
+    const top = p.s * f(p, k), bot = nd * k;
+    el('line', { x1: F.X(k), y1: F.Y(top), x2: F.X(k), y2: F.Y(bot), stroke: 'var(--ink)', 'stroke-width': 3, 'stroke-dasharray': '3 3' }, g);
+    el('line', { x1: F.X(k), y1: F.Y(bot), x2: F.X(k), y2: F.Y(0), stroke: 'var(--line)', 'stroke-width': 1 }, g);
+    txt(g, F.X(k), F.Y(0) + 30, `<tspan font-style="italic">k</tspan><tspan dy="6" font-size="0.65em">${j}</tspan>`, { 'font-size': 20, 'text-anchor': 'middle' });
+  });
+  txt(g, F.X(1.4) + 8, F.Y(p.s * f(p, 1.4)) - 12, 'Δk &gt; 0', { 'font-size': 17, 'font-style': 'italic' });
+  el('line', { x1: F.X(.6), y1: F.Y(0) - 12, x2: F.X(ks) - 14, y2: F.Y(0) - 12, stroke: 'var(--inv)', 'stroke-width': 3, 'marker-end': F.arrow }, g);
+
+  g = G(7);
+  const kh = 11;
+  el('line', { x1: F.X(kh), y1: F.Y(nd * kh), x2: F.X(kh), y2: F.Y(p.s * f(p, kh)), stroke: 'var(--ink)', 'stroke-width': 3, 'stroke-dasharray': '3 3' }, g);
+  el('line', { x1: F.X(kh), y1: F.Y(p.s * f(p, kh)), x2: F.X(kh), y2: F.Y(0), stroke: 'var(--line)', 'stroke-width': 1 }, g);
+  txt(g, F.X(kh) - 8, (F.Y(nd * kh) + F.Y(p.s * f(p, kh))) / 2 + 6, 'Δk &lt; 0', { 'font-size': 17, 'font-style': 'italic', 'text-anchor': 'end' });
+  txt(g, F.X(kh), F.Y(0) + 30, `<tspan font-style="italic">k</tspan><tspan dy="6" font-size="0.65em">0</tspan><tspan dy="-6">′</tspan>`, { 'font-size': 20, 'text-anchor': 'middle' });
+  el('line', { x1: F.X(kh) - 6, y1: F.Y(0) - 12, x2: F.X(ks) + 14, y2: F.Y(0) - 12, stroke: 'var(--dep)', 'stroke-width': 3, 'marker-end': F.arrow }, g);
+})();
+
+/* ---------------- interactive lab ---------------- */
+(function lab() {
+  const svg = $('#g-lab');
+  const ids = ['s', 'A', 'n', 'd', 'a'];
+  const TP = { s: .2, A: 1, n: .05, d: .05, a: .5 };
+  const xmax = 12, ymax = 3.6;
+  const F = frame(svg, { W: 760, H: 500, ml: 56, mr: 120, mt: 36, mb: 48, xmax, ymax });
+  // grid ticks
+  const gt = el('g', { class: 'tick' }, svg);
+  for (let k = 2; k <= xmax; k += 2) { el('line', { x1: F.X(k), y1: F.Y(0), x2: F.X(k), y2: F.Y(ymax), class: 'grid' }, gt); txt(gt, F.X(k), F.Y(0) + 20, k, { 'text-anchor': 'middle' }); }
+  for (let y = 1; y <= 3; y++) { el('line', { x1: F.X(0), y1: F.Y(y), x2: F.X(xmax), y2: F.Y(y), class: 'grid' }, gt); txt(gt, F.X(0) - 8, F.Y(y) + 4, y, { 'text-anchor': 'end' }); }
+  axes(svg, F, 'k', '');
+  const ghost = el('g', { opacity: .35, 'clip-path': F.clip }, svg);
+  const main = el('g', { 'clip-path': F.clip }, svg);
+  const labels = el('g', {}, svg);
+  const anim = el('g', {}, svg);
+  let base = Object.assign({}, TP);
+  let animId = null;
+
+  const read = () => { const p = {}; ids.forEach(i => p[i] = +$('#lab-' + i).value); return p; };
+  function draw(g, p, faded) {
+    g.innerHTML = '';
+    const w = faded ? 2.5 : 4, dash = faded ? '7 6' : null;
+    const nd = p.n + p.d;
+    const a1 = { d: curve(k => f(p, k), F, 0, xmax), fill: 'none', stroke: 'var(--prod)', 'stroke-width': w };
+    const a2 = { d: curve(k => p.s * f(p, k), F, 0, xmax), fill: 'none', stroke: 'var(--inv)', 'stroke-width': w };
+    const a3 = { d: `M${F.X(0)},${F.Y(0)}L${F.X(xmax)},${F.Y(nd * xmax)}`, fill: 'none', stroke: 'var(--dep)', 'stroke-width': w };
+    [a1, a2, a3].forEach(a => { if (dash) a['stroke-dasharray'] = dash; el('path', a, g); });
+    const ks = kstar(p);
+    if (ks <= xmax) {
+      const ys = f(p, ks), is = nd * ks;
+      if (!faded) {
+        el('line', { x1: F.X(ks), y1: F.Y(ys), x2: F.X(ks), y2: F.Y(0), stroke: 'var(--muted)', 'stroke-dasharray': '4 5', 'stroke-width': 1.5 }, g);
+        el('line', { x1: F.X(ks), y1: F.Y(ys), x2: F.X(ks), y2: F.Y(is), stroke: 'var(--cons)', 'stroke-width': 5 }, g);
+        el('circle', { cx: F.X(ks), cy: F.Y(is), r: 7, fill: 'var(--accent)' }, g);
+      } else {
+        el('circle', { cx: F.X(ks), cy: F.Y(is), r: 5, fill: 'var(--muted)' }, g);
+      }
+    }
+  }
+  function drawLabels(p) {
+    labels.innerHTML = '';
+    const nd = p.n + p.d, clampY = v => Math.max(F.o.mt + 6, Math.min(F.Y(0) - 6, v));
+    txt(labels, F.X(xmax) + 10, clampY(F.Y(f(p, xmax)) + 6), `<tspan font-style="italic">Ak</tspan>${sup('α')}`, { 'font-size': 20, fill: 'var(--prod)' });
+    txt(labels, F.X(xmax) + 10, clampY(F.Y(p.s * f(p, xmax)) + 6), `<tspan font-style="italic">sAk</tspan>${sup('α')}`, { 'font-size': 20, fill: 'var(--inv)' });
+    const xe = Math.min(xmax, ymax / nd);
+    txt(labels, Math.min(F.X(xe) + 10, F.X(xmax) + 10), clampY(F.Y(nd * xe) + (xe < xmax ? -8 : 6)), '<tspan font-style="italic">(n+δ)k</tspan>', { 'font-size': 20, fill: 'var(--dep)' });
+    const ks = kstar(p);
+    if (ks <= xmax) {
+      txt(labels, F.X(ks), F.Y(0) + 40, '<tspan font-style="italic">k*</tspan>', { 'font-size': 20, 'text-anchor': 'middle', 'font-weight': 600, fill: 'var(--accent)' });
+      txt(labels, F.X(ks) - 10, (F.Y(f(p, ks)) + F.Y(nd * ks)) / 2 + 6, '<tspan font-style="italic">c*</tspan>', { 'font-size': 18, 'text-anchor': 'end', fill: 'var(--cons)', 'font-weight': 600 });
+    } else {
+      txt(labels, F.X(xmax) - 4, F.Y(ymax) + 16, 'k* fuera del gráfico →', { 'font-size': 16, 'text-anchor': 'end', fill: 'var(--muted)', 'font-style': 'italic' });
+    }
+  }
+  function update() {
+    if (animId) { cancelAnimationFrame(animId); animId = null; anim.innerHTML = ''; }
+    const p = read();
+    $('#o-s').textContent = fmt(p.s, 2); $('#o-A').textContent = fmt(p.A, 2);
+    $('#o-n').textContent = fmt(p.n, 3); $('#o-d').textContent = fmt(p.d, 3); $('#o-a').textContent = fmt(p.a, 2);
+    draw(main, p, false); drawLabels(p);
+    const ks = kstar(p), ys = f(p, ks), is = (p.n + p.d) * ks, cs = ys - is;
+    const show = v => v > 999 ? '>999' : fmt(v, 2);
+    $('#r-k').textContent = show(ks); $('#r-y').textContent = show(ys); $('#r-c').textContent = show(cs); $('#r-i').textContent = show(is);
+    const kb = kstar(base), cb = (1 - base.s) * f(base, kb);
+    const arrow = (v, b) => Math.abs(v - b) < 1e-9 ? '=' : (v > b ? '↑' : '↓');
+    const changed = ids.some(i => Math.abs(p[i] - base[i]) > 1e-9);
+    let h = changed ? `Respecto de la base: k* ${arrow(ks, kb)} · y* ${arrow(ys, f(base, kb))} · c* ${arrow(cs, cb)}. ` : 'Mové un parámetro: la curva tenue punteada es la base. ';
+    h += p.s < p.a - 1e-9 ? `<br>s &lt; α → subir s <b>aumenta</b> c* (regla de oro: s = α).` : p.s > p.a + 1e-9 ? `<br>s &gt; α → subir s <b>reduce</b> c* (se ahorra “demasiado”).` : `<br>s = α: regla de oro, c* máximo.`;
+    $('#lab-hint').innerHTML = h;
+  }
+  function setBase() { base = read(); draw(ghost, base, true); update(); }
+  function animate() {
+    const p = read();
+    let k = Math.min(kstar(base), xmax), target = kstar(p);
+    if (target > xmax * 1.5) return;
+    anim.innerHTML = '';
+    const trail = el('g', {}, anim);
+    const vl = el('line', { stroke: 'var(--ink)', 'stroke-width': 3 }, anim);
+    const dot = el('circle', { r: 8, fill: 'var(--accent)', stroke: 'var(--surface)', 'stroke-width': 2 }, anim);
+    let t = 0, last = 0;
+    const step = ts => {
+      if (ts - last > 45) {
+        last = ts;
+        const inv = p.s * f(p, k), dep = (p.n + p.d) * k;
+        vl.setAttribute('x1', F.X(k)); vl.setAttribute('x2', F.X(k));
+        vl.setAttribute('y1', F.Y(inv)); vl.setAttribute('y2', F.Y(dep));
+        vl.setAttribute('stroke', inv >= dep ? 'var(--inv)' : 'var(--dep)');
+        dot.setAttribute('cx', F.X(k)); dot.setAttribute('cy', F.Y(0));
+        if (t % 3 === 0) el('circle', { cx: F.X(k), cy: F.Y(0), r: 3, fill: 'var(--muted)' }, trail);
+        k = nextK(p, k); t++;
+      }
+      if (t < 160 && Math.abs(k - target) / target > 0.002) animId = requestAnimationFrame(step);
+      else { dot.setAttribute('cx', F.X(Math.min(target, xmax))); vl.remove(); animId = null; }
+    };
+    animId = requestAnimationFrame(step);
+  }
+  ids.forEach(i => $('#lab-' + i).addEventListener('input', update));
+  $('#lab-base').addEventListener('click', setBase);
+  $('#lab-anim').addEventListener('click', animate);
+  $('#lab-reset').addEventListener('click', () => { ids.forEach(i => $('#lab-' + i).value = TP[i]); setBase(); });
+  setBase();
+})();
+
+/* ---------------- transition path ---------------- */
+(function path() {
+  const p = { s: .2, A: 1, n: .05, d: .05, a: .5 };
+  const ks = kstar(p), T = 80;
+  const s1 = $('#g-path'), s2 = $('#g-growth');
+  function linechart(svg, series, o) {
+    svg.innerHTML = '';
+    const F = frame(svg, { W: 560, H: 270, ml: 58, mr: 24, mt: 34, mb: 40, xmin: 0, xmax: T, ymin: o.ymin, ymax: o.ymax });
+    const gt = el('g', { class: 'tick' }, svg);
+    for (let t = 0; t <= T; t += 20) txt(gt, F.X(t), F.Y(o.ymin) + 20, t, { 'text-anchor': 'middle' });
+    o.yticks.forEach(v => { el('line', { x1: F.X(0), y1: F.Y(v), x2: F.X(T), y2: F.Y(v), class: 'grid' }, gt); txt(gt, F.X(0) - 8, F.Y(v) + 4, o.yfmt(v), { 'text-anchor': 'end' }); });
+    el('line', { x1: F.X(0), y1: F.Y(o.ymin), x2: F.X(T), y2: F.Y(o.ymin), class: 'axis' }, svg);
+    el('line', { x1: F.X(0), y1: F.Y(o.ymin), x2: F.X(0), y2: F.Y(o.ymax), class: 'axis' }, svg);
+    txt(svg, F.X(T), F.Y(o.ymin) + 36, 't (períodos)', { 'font-size': 13, 'text-anchor': 'end', fill: 'var(--muted)', 'font-family': 'Inter' });
+    txt(svg, 58, 22, o.title, { 'font-size': 15, 'font-family': 'Inter', 'font-weight': 600 });
+    series.forEach(sr => {
+      const d = sr.data.map((v, t) => (t ? 'L' : 'M') + F.X(t).toFixed(1) + ',' + F.Y(v).toFixed(1)).join('');
+      el('path', { d, fill: 'none', stroke: sr.color, 'stroke-width': sr.w || 3.5, 'stroke-dasharray': sr.dash || null }, svg);
+      if (sr.label) txt(svg, F.X(T) - 4, F.Y(sr.data[T]) + (sr.dy || -8), sr.label, { 'font-size': 16, fill: sr.color, 'text-anchor': 'end', 'font-style': 'italic', 'font-weight': 600 });
+    });
+  }
+  const niceTicks = (lo, hi, n = 4) => {
+    const raw = (hi - lo) / n, mag = Math.pow(10, Math.floor(Math.log10(raw))), st = [1, 2, 2.5, 5, 10].map(m => m * mag).find(m => raw <= m);
+    const out = []; for (let v = Math.ceil(lo / st) * st; v <= hi + 1e-12; v += st) out.push(+v.toFixed(10));
+    return out;
+  };
+  function update() {
+    const k0 = +$('#k0').value;
+    $('#o-k0').textContent = fmt(k0, 2);
+    const k = [k0]; for (let t = 0; t < T; t++) k.push(nextK(p, k[t]));
+    const gk = [], gK = [];
+    for (let t = 0; t <= T; t++) { const kn = t < T ? k[t + 1] : nextK(p, k[t]); gk.push((kn / k[t] - 1) * 100); gK.push(((1 + p.n) * kn / k[t] - 1) * 100); }
+    const kmax = Math.max(k0, ks) * 1.15;
+    linechart(s1, [
+      { data: k.map(() => ks), color: 'var(--accent)', dash: '6 6', w: 2, label: 'k* = 4', dy: -8 },
+      { data: k, color: 'var(--ink)', label: '' }
+    ], { ymin: 0, ymax: kmax, yticks: niceTicks(0, kmax), yfmt: v => fmt(v, v % 1 ? 1 : 0), title: 'Capital per cápita  kₜ' });
+    const lo = Math.min(0, ...gk, ...gK) - .3, hi = Math.max(p.n * 100, ...gk, ...gK) + .5;
+    linechart(s2, [
+      { data: gK.map(() => p.n * 100), color: 'var(--muted)', dash: '6 6', w: 2, label: 'n = 5%', dy: 18 },
+      { data: gK, color: 'var(--prod)', label: 'agregado K', dy: -10 },
+      { data: gk, color: 'var(--inv)', label: 'per cápita k', dy: -10 }
+    ], { ymin: lo, ymax: hi, yticks: niceTicks(lo, hi), yfmt: v => fmt(v, v % 1 ? 1 : 0) + '%', title: 'Tasas de crecimiento (%)' });
+    const where = k0 < ks - 1e-6 ? 'por debajo' : k0 > ks + 1e-6 ? 'por encima' : 'justo en';
+    const cmp = gK[0] > p.n * 100 + 1e-6 ? 'más que' : gK[0] < p.n * 100 - 1e-6 ? 'menos que' : 'igual que';
+    $('#path-read').innerHTML = `<b>k₀ = ${fmt(k0, 2)}</b> está ${where} de k* = 4.<br>En t = 0: g<sub>k</sub> = ${fmt(gk[0], 3)}% · g<sub>K</sub> = ${fmt(gK[0], 3)}% → las agregadas crecen <b>${cmp} n</b>.`;
+  }
+  $('#k0').addEventListener('input', update);
+  update();
+})();
+
+/* ---------------- Five countries, log scale ---------------- */
+(function countries() {
+  // Banco Mundial WDI, NY.GDP.PCAP.KD (US$ constantes 2015), 1960–2025
+  const USA = [18992,  19109,  19965,  20546,  21438,  22526,  23715,  24045,  24948,  25472,  25231,  25734,  26799,  28043,  27637,  27310,  28509,  29529,  30835,  31462,  31082,  31559,  30696,  31811,  33819,  34918,  35795,  36702,  37889,  38912,  39200,  38638,  39448,  40002,  41107,  41711,  42784,  44152,  45596,  47234,  48616,  48597,  48967,  49906,  51348,  52650,  53596,  54153,  53704,  51864,  52813,  53216,  54001,  54729,  55665,  56849,  57431,  58436,  59818,  61048,  59534,  63097,  64322,  65667,  66857,  67946];
+  const ARG = [7397,  7671,  7480,  6968,  7551,  8220,  8041,  8172,  8436,  9112,  9244,  9615,  9618,  9730,  10100,  9936,  9585,  10088,  9481,  10285,  10276,  9588,  9366,  9618,  9614,  8973,  9378,  9484,  9237,  8445,  8115,  8730,  9293,  9921,  10360,  9934,  10352,  11057,  11348,  10838,  10632,  10052,  8862,  9546,  10302,  11100,  11870,  12812,  13197,  12285,  13387,  14041,  13754,  13946,  13456,  13680,  13266,  13520,  13058,  12706,  11393,  12549,  13277,  12993,  12774,  13287];
+  const KOR = [1038,  1077,  1088,  1153,  1229,  1286,  1405,  1498,  1657,  1856,  2001,  2171,  2287,  2583,  2784,  2955,  3294,  3645,  3987,  4270,  4140,  4378,  4676,  5228,  5713,  6106,  6741,  7535,  8367,  8878,  9673,  10619,  11177,  11837,  12817,  13924,  14894,  15682,  14801,  16403,  17763,  18460,  19775,  20278,  21245,  22124,  23162,  24392,  24935,  25010,  26623,  27393,  27944,  28733,  29471,  30172,  31005,  31980,  32853,  33496,  33216,  34793,  35809,  36348,  37048,  37470];
+  const JPN = [6481,  7197,  7766,  8339,  9216,  9648,  10578,  11629,  12980,  14427,  14319,  14666,  15679,  16702,  16279,  16570,  17045,  17622,  18383,  19228,  19614,  20292,  20819,  21403,  22222,  23239,  23884,  24894,  26473,  27648,  28905,  29775,  29917,  29665,  29876,  30505,  31371,  31723,  31076,  30912,  31779,  31793,  31746,  32116,  32783,  33386,  33881,  34427,  34009,  31994,  33311,  33306,  33909,  34637,  34997,  35665,  35934,  36548,  36899,  36837,  35363,  36793,  37448,  37903,  37977,  38619];
+  const ESP = [6285,  6964,  7587,  8242,  8594,  9033,  9589,  9883,  10398,  11213,  11560,  11952,  12784,  13629,  14238,  14161,  14475,  14734,  14806,  14682,  14886,  14761,  14856,  15045,  15250,  15548,  16006,  16850,  17671,  18495,  19175,  19613,  19699,  19394,  19762,  20218,  20659,  21310,  22135,  23018,  24107,  24878,  25205,  25481,  25825,  26294,  26899,  27339,  27113,  25861,  25766,  25511,  24764,  24499,  24948,  25982,  26719,  27426,  27957,  28301,  25077,  26705,  28203,  28559,  29245,  29763];
+  const Y0 = 1960, T = USA.length - 1;
+  const svg = $('#g-cx');
+  const L = Math.log10, lo = 800, hi = 90000;
+  const F = frame(svg, { W: 760, H: 420, ml: 70, mr: 118, mt: 20, mb: 40, xmin: Y0, xmax: Y0 + T, ymin: L(lo), ymax: L(hi) });
+  const gt = el('g', { class: 'tick' }, svg);
+  [1000, 2000, 5000, 10000, 20000, 50000].forEach(v => {
+    el('line', { x1: F.X(Y0), y1: F.Y(L(v)), x2: F.X(Y0 + T), y2: F.Y(L(v)), class: 'grid' }, gt);
+    txt(gt, F.X(Y0) - 8, F.Y(L(v)) + 4, 'US$ ' + (v / 1000) + 'k', { 'text-anchor': 'end' });
+  });
+  for (let y = 1960; y <= 2020; y += 10) txt(gt, F.X(y), F.Y(L(lo)) + 22, y, { 'text-anchor': 'middle' });
+  el('line', { x1: F.X(Y0), y1: F.Y(L(lo)), x2: F.X(Y0 + T), y2: F.Y(L(lo)), class: 'axis' }, svg);
+  const line = a => a.map((v, t) => (t ? 'L' : 'M') + F.X(Y0 + t).toFixed(1) + ',' + F.Y(L(v)).toFixed(1)).join('');
+  const k = v => fmt(v / 1000, 1);
+  const series = [
+    { c: 'USA', d: USA, name: 'EE.UU.', col: 'prod', f: null, dy: 5 },
+    { c: 'ARG', d: ARG, name: 'Argentina', col: 'dep', f: null, dy: 5 },
+    { c: 'KOR', d: KOR, name: 'Corea', col: 'inv', f: 1, dy: 9 },
+    { c: 'JPN', d: JPN, name: 'Japón', col: 'violet', f: 2, dy: -9 },
+    { c: 'ESP', d: ESP, name: 'España', col: 'accent', f: 3, dy: 18 },
+  ];
+  series.forEach(s => {
+    const g = el('g', s.f ? { 'data-f': s.f } : { class: 'always' }, svg);
+    el('path', { d: line(s.d), fill: 'none', stroke: `var(--${s.col})`, 'stroke-width': s.c === 'ARG' ? 4 : 3, class: 'draw', pathLength: 1 }, g);
+    txt(g, F.X(Y0 + T) + 8, F.Y(L(s.d[T])) + s.dy, s.name, { 'font-size': 16, fill: `var(--${s.col})`, 'font-family': 'Inter', 'font-weight': 700 });
+    $(`#cx-${s.c}-0`).textContent = k(s.d[0]);
+    $(`#cx-${s.c}-1`).textContent = k(s.d[T]);
+    const gr = $(`#cx-${s.c}-g`);
+    gr.textContent = fmt((Math.pow(s.d[T] / s.d[0], 1 / T) - 1) * 100, 1) + '%';
+    gr.style.color = `var(--${s.col})`;
+  });
+  // Corea pasa a Argentina
+  const yr = KOR.findIndex((v, t) => v > ARG[t]);
+  const m = el('g', { 'data-f': 1 }, svg);
+  el('circle', { cx: F.X(Y0 + yr), cy: F.Y(L(KOR[yr])), r: 6, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 2 }, m);
+  txt(m, F.X(Y0 + yr) + 10, F.Y(L(KOR[yr])) + 26, `${Y0 + yr}: Corea pasa a Argentina`, { 'font-size': 14, fill: 'var(--ink)', 'font-family': 'Inter', 'font-weight': 600 });
+})();
+
+/* ---------------- Argentina vs counterfactual ---------------- */
+(function argentina() {
+  // Banco Mundial WDI, NY.GDP.PCAP.KD (US$ constantes 2015), 1960–2025
+  const ARG = [7397, 7671, 7480, 6968, 7551, 8220, 8041, 8172, 8436, 9112, 9244, 9615, 9618, 9730, 10100, 9936, 9585, 10088, 9481, 10285, 10276, 9588, 9366, 9618, 9614, 8973, 9378, 9484, 9237, 8445, 8115, 8730, 9293, 9921, 10360, 9934, 10352, 11057, 11348, 10838, 10632, 10052, 8862, 9546, 10302, 11100, 11870, 12812, 13197, 12285, 13387, 14041, 13754, 13946, 13456, 13680, 13266, 13520, 13058, 12706, 11393, 12549, 13277, 12993, 12774, 13287];
+  const USA = [18992, 19109, 19965, 20546, 21438, 22526, 23715, 24045, 24948, 25472, 25231, 25734, 26799, 28043, 27637, 27310, 28509, 29529, 30835, 31462, 31082, 31559, 30696, 31811, 33819, 34918, 35795, 36702, 37889, 38912, 39200, 38638, 39448, 40002, 41107, 41711, 42784, 44152, 45596, 47234, 48616, 48597, 48967, 49906, 51348, 52650, 53596, 54153, 53704, 51864, 52813, 53216, 54001, 54729, 55665, 56849, 57431, 58436, 59818, 61048, 59534, 63097, 64322, 65667, 66857, 67946];
+  const Y0 = 1960, T = ARG.length - 1;
+  const svg = $('#g-arg');
+  // el eje vertical se reescala según la tasa elegida (hasta 3,5%)
+  const W = 760, H = 410, ml = 76, mr = 40, mt = 30, mb = 44;
+  const F = frame(svg, { W, H, ml, mr, mt, mb, xmin: Y0, xmax: Y0 + T, ymin: 0, ymax: 1 });
+  let ymax = 32000;
+  const Yv = v => mt + (1 - v / ymax) * (H - mt - mb);
+  const gt = el('g', { class: 'tick' }, svg);
+  for (let y = 1960; y <= 2020; y += 10) txt(svg, F.X(y), Yv(0) + 22, y, { 'text-anchor': 'middle', class: 'tick', 'font-family': 'Inter', 'font-size': 13, fill: 'var(--muted)' });
+  el('line', { x1: F.X(Y0), y1: Yv(0), x2: F.X(Y0 + T), y2: Yv(0), class: 'axis' }, svg);
+  const line = (data) => data.map((v, t) => (t ? 'L' : 'M') + F.X(Y0 + t).toFixed(1) + ',' + Yv(v).toFixed(1)).join('');
+  const gap = el('g', { 'data-f': 1 }, svg);
+  const cf = el('g', { 'data-f': 1 }, svg);
+  const real = el('g', { class: 'always' }, svg);
+  const realPath = el('path', { fill: 'none', stroke: 'var(--dep)', 'stroke-width': 3.5, class: 'draw', pathLength: 1 }, real);
+  const realLbl = txt(real, F.X(Y0 + T) - 4, 0, 'Argentina real', { 'font-size': 18, fill: 'var(--dep)', 'text-anchor': 'end', 'font-family': 'Inter', 'font-weight': 700 });
+  const avg = (a) => (Math.pow(a[T] / a[0], 1 / T) - 1) * 100;
+  $('#arg-avg').textContent = fmt(avg(ARG), 1);
+  $('#usa-avg').textContent = fmt(avg(USA), 1);
+  $('#arg-real').textContent = 'US$ ' + ARG[T].toLocaleString('es-AR');
+  function upd() {
+    const g = +$('#arg-g').value / 100;
+    const C = ARG.map((_, t) => ARG[0] * Math.pow(1 + g, t));
+    const step = C[T] > 36000 ? 10000 : 5000;
+    ymax = Math.max(32000, Math.ceil(C[T] * 1.1 / step) * step);
+    gt.innerHTML = '';
+    for (let y = 0; y <= ymax; y += step) { el('line', { x1: F.X(Y0), y1: Yv(y), x2: F.X(Y0 + T), y2: Yv(y), class: 'grid' }, gt); txt(gt, F.X(Y0) - 8, Yv(y) + 4, 'US$ ' + (y / 1000) + 'k', { 'text-anchor': 'end' }); }
+    realPath.setAttribute('d', line(ARG));
+    realLbl.setAttribute('y', Yv(ARG[T]) + 28);
+    const gs = fmt(g * 100, 1).replace(',0', '') + '%';
+    $('#arg-gv').textContent = gs; $('#arg-g2').textContent = gs; $('#arg-gtitle').textContent = gs;
+    $('#arg-cf').textContent = 'US$ ' + Math.round(C[T]).toLocaleString('es-AR');
+    $('#arg-x').textContent = '×' + fmt(C[T] / ARG[T], 1);
+    const fresh = !cf.firstChild;
+    gap.innerHTML = ''; cf.innerHTML = '';
+    let d = line(C);
+    for (let t = T; t >= 0; t--) d += 'L' + F.X(Y0 + t).toFixed(1) + ',' + Yv(ARG[t]).toFixed(1);
+    el('path', { d: d + 'Z', fill: 'var(--accent)', opacity: .13 }, gap);
+    const a = { d: line(C), fill: 'none', stroke: 'var(--accent)', 'stroke-width': 3.5 };
+    if (fresh) { a.class = 'draw'; a.pathLength = 1; }
+    el('path', a, cf);
+    txt(cf, F.X(Y0 + T) - 4, Yv(C[T]) - 12, 'Argentina creciendo al ' + gs, { 'font-size': 18, fill: 'var(--accent)', 'text-anchor': 'end', 'font-family': 'Inter', 'font-weight': 700 });
+  }
+  $('#arg-g').addEventListener('input', upd);
+  upd();
+})();
+
+/* ---------------- bathtub (steady state intuition) ---------------- */
+(function tub() {
+  const svg = $('#g-tub');
+  const p = { s: .2, A: 1, n: .05, d: .05, a: .5 };
+  const ks = kstar(p), KMAX = 7;
+  const tb = { x: 90, y: 110, w: 260, h: 200 };
+  const lvl = k => tb.y + tb.h - Math.min(k, KMAX) / KMAX * tb.h;
+  const fx = tb.x + 30;
+  el('rect', { x: 20, y: 40, width: fx - 2, height: 18, rx: 6, fill: 'var(--muted)' }, svg);
+  el('rect', { x: fx - 9, y: 40, width: 18, height: 40, rx: 4, fill: 'var(--muted)' }, svg);
+  txt(svg, 20, 28, 'canilla = inversión  sAk^α', { 'font-size': 15, fill: 'var(--inv)', 'font-family': 'Inter', 'font-weight': 700 });
+  const inflow = el('rect', { y: 80, fill: 'var(--inv)', opacity: .8, rx: 3 }, svg);
+  const water = el('rect', { x: tb.x, width: tb.w, fill: 'color-mix(in srgb,var(--prod) 35%,transparent)' }, svg);
+  el('path', { d: `M${tb.x},${tb.y - 10}L${tb.x},${tb.y + tb.h}L${tb.x + tb.w},${tb.y + tb.h}L${tb.x + tb.w},${tb.y - 10}`, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 5, 'stroke-linejoin': 'round' }, svg);
+  el('line', { x1: tb.x - 8, x2: tb.x + tb.w + 8, y1: lvl(ks), y2: lvl(ks), stroke: 'var(--accent)', 'stroke-width': 2.5, 'stroke-dasharray': '8 6' }, svg);
+  txt(svg, tb.x - 12, lvl(ks) + 6, 'k*', { 'font-size': 20, fill: 'var(--accent)', 'text-anchor': 'end', 'font-weight': 600, 'font-style': 'italic' });
+  const dx = tb.x + tb.w - 40;
+  el('rect', { x: dx, y: tb.y + tb.h, width: 18, height: 20, fill: 'var(--muted)' }, svg);
+  const outflow = el('rect', { y: tb.y + tb.h + 20, height: 26, fill: 'var(--dep)', opacity: .8, rx: 3 }, svg);
+  txt(svg, dx + 40, tb.y + tb.h + 40, 'desagüe = (n+δ)k', { 'font-size': 15, fill: 'var(--dep)', 'font-family': 'Inter', 'font-weight': 700 });
+  const lab = txt(svg, tb.x + tb.w / 2, 0, '', { 'font-size': 20, 'text-anchor': 'middle', 'font-weight': 600 });
+  const info = txt(svg, 372, 130, '', { 'font-size': 15, 'font-family': 'Inter' });
+  let k = 1, t = 0, raf = null, last = 0;
+  function render() {
+    const inv = p.s * f(p, k), dep = (p.n + p.d) * k;
+    const wi = 4 + inv * 50, wo = 4 + dep * 50;
+    const top = lvl(k);
+    inflow.setAttribute('x', fx - wi / 2); inflow.setAttribute('width', wi); inflow.setAttribute('height', Math.max(0, top - 80));
+    outflow.setAttribute('x', dx + 9 - wo / 2); outflow.setAttribute('width', wo);
+    water.setAttribute('y', top); water.setAttribute('height', tb.y + tb.h - top);
+    lab.setAttribute('y', Math.min(top + 30, tb.y + tb.h - 8)); lab.innerHTML = `<tspan font-style="italic">k</tspan> = ${fmt(k, 2)}`;
+    const st = Math.abs(inv - dep) < 0.004 ? '<tspan fill="var(--accent)" font-weight="700">entra = sale → quieto</tspan>' : inv > dep ? '<tspan fill="var(--inv)" font-weight="700">entra &gt; sale → sube</tspan>' : '<tspan fill="var(--dep)" font-weight="700">sale &gt; entra → baja</tspan>';
+    info.innerHTML = `<tspan x="372" dy="0">período t = ${t}</tspan><tspan x="372" dy="26" fill="var(--inv)">entra: ${fmt(inv, 3)}</tspan><tspan x="372" dy="22" fill="var(--dep)">sale: ${fmt(dep, 3)}</tspan><tspan x="372" dy="26">${st}</tspan>`;
+  }
+  function run(k0) {
+    if (raf) cancelAnimationFrame(raf);
+    k = k0; t = 0; last = 0; render();
+    const step = ts => {
+      if (ts - last > 70) { last = ts; k = nextK(p, k); t++; render(); }
+      if (t < 150 && Math.abs(k - ks) > 0.002) raf = requestAnimationFrame(step); else raf = null;
+    };
+    raf = requestAnimationFrame(step);
+  }
+  $('#tub-low').addEventListener('click', () => run(0.6));
+  $('#tub-high').addEventListener('click', () => run(6.8));
+  render();
+})();
+
+/* ---------------- deck engine ---------------- */
+const deck = $('#deck');
+const slides = $$('.slide', deck);
+let cur = 0, step = 0;
+const frags = slides.map(s => $$('[data-f]', s));
+const maxStep = frags.map(fs => fs.reduce((m, e) => Math.max(m, +e.dataset.f), 0));
+
+function fit() {
+  const sc = Math.min(innerWidth / 1280, innerHeight / 720);
+  deck.style.transform = `translate(-50%,-50%) scale(${sc})`;
+}
+function applyFrags(i, st, instant) {
+  frags[i].forEach(e => {
+    if (instant) { e.style.transition = 'none'; e.querySelectorAll('path.draw').forEach(p => p.style.transition = 'none'); }
+    e.classList.toggle('shown', +e.dataset.f <= st);
+    if (instant) requestAnimationFrame(() => requestAnimationFrame(() => { e.style.transition = ''; e.querySelectorAll('path.draw').forEach(p => p.style.transition = ''); }));
+  });
+}
+function go(i, st = 0, instant = false) {
+  i = Math.max(0, Math.min(slides.length - 1, i));
+  slides.forEach((s, j) => { s.classList.toggle('active', j === i); s.classList.toggle('past', j < i); });
+  cur = i; step = st;
+  applyFrags(i, st, instant);
+  $('#progress').style.width = ((i + 1) / slides.length * 100) + '%';
+  $('#f-sec').textContent = slides[i].dataset.sec || '';
+  $('#f-num').textContent = i ? `${i + 1} / ${slides.length}` : '';
+  const n = $('.notes', slides[i]);
+  $('#notes-body').innerHTML = n ? n.innerHTML : '<i>Sin notas.</i>';
+  history.replaceState(null, '', '#' + (i + 1));
+  startClock();
+}
+function next() { if (step < maxStep[cur]) { step++; applyFrags(cur, step); } else if (cur < slides.length - 1) go(cur + 1, 0); }
+function prev() { if (step > 0) { step--; applyFrags(cur, step); } else if (cur > 0) go(cur - 1, maxStep[cur - 1], true); }
+
+let t0 = null;
+function startClock() { if (!t0 && cur > 0) t0 = Date.now(); }
+setInterval(() => {
+  if (!t0) return;
+  const s = Math.floor((Date.now() - t0) / 1000);
+  $('#clock').textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+}, 1000);
+
+function toggleFull() { if (!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); }
+function toggleTheme() {
+  const r = document.documentElement;
+  r.dataset.theme = r.dataset.theme === 'dark' ? 'light' : 'dark';
+  try { localStorage.setItem('solow-theme', r.dataset.theme); } catch (e) {}
+}
+try { const th = localStorage.getItem('solow-theme'); if (th) document.documentElement.dataset.theme = th; } catch (e) {}
+
+document.addEventListener('keydown', e => {
+  const tag = e.target.tagName;
+  if (tag === 'INPUT' && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown'].includes(e.key)) {
+    if (e.key !== 'PageUp' && e.key !== 'PageDown') return;
+  }
+  if (tag === 'BUTTON' && (e.key === ' ' || e.key === 'Enter')) return;
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  switch (e.key) {
+    case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown': case 'Enter': e.preventDefault(); next(); break;
+    case 'ArrowLeft': case 'ArrowUp': case 'PageUp': case 'Backspace': e.preventDefault(); prev(); break;
+    case 'Home': go(0); break;
+    case 'End': go(slides.length - 1, maxStep[slides.length - 1], true); break;
+    case 'f': case 'F': toggleFull(); break;
+    case 'n': case 'N': $('#notes').classList.toggle('on'); break;
+    case 't': case 'T': toggleTheme(); break;
+    case 'Escape': $('#notes').classList.remove('on'); break;
+  }
+});
+$('#b-next').onclick = e => { e.currentTarget.blur(); next(); };
+$('#b-prev').onclick = e => { e.currentTarget.blur(); prev(); };
+$('#b-full').onclick = e => { e.currentTarget.blur(); toggleFull(); };
+
+let tx = null;
+deck.addEventListener('touchstart', e => { if (e.target.tagName !== 'INPUT') tx = e.touches[0].clientX; }, { passive: true });
+deck.addEventListener('touchend', e => { if (tx == null) return; const dx = e.changedTouches[0].clientX - tx; if (Math.abs(dx) > 50) (dx < 0 ? next : prev)(); tx = null; });
+
+addEventListener('resize', fit);
+window.deckGo = (i, all) => go(i - 1, all ? maxStep[i - 1] : 0, true);
+fit();
+const h = parseInt(location.hash.slice(1), 10);
+go(isNaN(h) ? 0 : h - 1, 0, true);
+})();
+</script>
+</body>
+</html>
