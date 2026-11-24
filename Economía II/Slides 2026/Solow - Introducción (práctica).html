@@ -705,7 +705,6 @@ aside.notes{display:none}
       <div class="callout" data-f="1" style="padding:12px 18px"><p><b>En el largo plazo</b>, <i class="v">y</i>, <i class="v">c</i> y <i class="v">k</i> crecen todas a la tasa <b class="c-acc"><i>g</i></b>: el motor del crecimiento sostenido es la <b>tecnología</b>, no la acumulación de capital.</p></div>
     </div>
   </div>
-  <p class="muted" style="margin-top:8px;font-size:13px">Solow toma <i class="v">g</i> como <b>exógeno</b>; explicar de dónde sale es tarea del <b>crecimiento endógeno</b> (Romer, Lucas). → <b>Ejercicio 2 del TP.</b></p>
   <aside class="notes">El truco del E2: el progreso técnico entra como X (aumentador de trabajo / Harrod-neutral), que crece a g. Se trabaja con variables por “unidad de eficiencia” (dividir por X·N en vez de N): ahí hay un estado estacionario como antes. Pero volviendo a per cápita (dividir por N), y, c, k crecen todas a g en el largo plazo; las agregadas a g+n. El gráfico muestra la intuición: la tecnologa corre la curva de producción hacia arriba cada período, así que k nunca “alcanza” a un techo fijo. g es exógeno (dado); de dónde sale g lo responde el crecimiento endógeno. Esto es exactamente el Ejercicio 2.</aside>
 </section>
 
@@ -1165,17 +1164,22 @@ function solowGraph(svg, p, opts) {
 (function tech() {
   const svg = $('#g-tech');
   if (!svg) return;
-  const p = { a: .5, A: 1 }, p2 = { a: .5, A: 1.7 };
-  const F = frame(svg, { W: 520, H: 300, ml: 42, mr: 44, mt: 24, mb: 36, xmax: 10, ymax: 4.4 });
+  const p = { a: .5, A: 1 }, p2 = { a: .5, A: 1.55 };
+  const F = frame(svg, { W: 520, H: 300, ml: 56, mr: 70, mt: 44, mb: 42, xmax: 10, ymax: 5.4 });
+  // light horizontal guides so the y axis reads clearly
+  const gt = el('g', { class: 'tick' }, svg);
+  [1, 2, 3, 4, 5].forEach(y => el('line', { x1: F.X(0), y1: F.Y(y), x2: F.X(10), y2: F.Y(y), class: 'grid' }, gt));
   axes(svg, F, 'k', '<tspan font-style="italic">y</tspan>');
+  // hoy (always)
   const g1 = el('g', { class: 'always' }, svg);
   el('path', { d: curve(k => f(p, k), F, 0, 10), fill: 'none', stroke: 'var(--prod)', 'stroke-width': 3.5, class: 'draw', pathLength: 1 }, g1);
-  txt(g1, F.X(10) + 6, F.Y(f(p, 10)) + 6, 'hoy', { 'font-size': 14, fill: 'var(--prod)', 'font-family': 'Inter', 'font-weight': 700 });
+  txt(g1, F.X(10) + 8, F.Y(f(p, 10)) + 5, 'hoy', { 'font-size': 15, fill: 'var(--prod)', 'font-family': 'Inter', 'font-weight': 700 });
+  // mañana (fragment, drawn on top)
   const g2 = el('g', { 'data-f': 1 }, svg);
-  el('path', { d: curve(k => f(p2, k), F, 0, 10), fill: 'none', stroke: 'var(--accent)', 'stroke-width': 3.5 }, g2);
-  txt(g2, F.X(10) + 6, F.Y(f(p2, 10)) + 6, 'mañana', { 'font-size': 14, fill: 'var(--accent)', 'font-family': 'Inter', 'font-weight': 700 });
-  [2.6, 5.5].forEach(k => el('line', { x1: F.X(k), y1: F.Y(f(p, k)) - 3, x2: F.X(k), y2: F.Y(f(p2, k)) + 3, stroke: 'var(--accent)', 'stroke-width': 2.5, 'marker-end': F.arrow }, g2));
-  txt(g2, F.X(4), F.Y(3.95), 'progreso técnico: +g', { 'font-size': 15, fill: 'var(--accent)', 'font-family': 'Inter', 'font-weight': 700, 'text-anchor': 'middle' });
+  el('path', { d: curve(k => f(p2, k), F, 0, 10), fill: 'none', stroke: 'var(--accent)', 'stroke-width': 3.5, class: 'draw', pathLength: 1 }, g2);
+  [2.5, 5.5].forEach(k => el('line', { x1: F.X(k), y1: F.Y(f(p, k)) - 2, x2: F.X(k), y2: F.Y(f(p2, k)) + 3, stroke: 'var(--accent)', 'stroke-width': 2.5, 'marker-end': F.arrow }, g2));
+  txt(g2, F.X(10) + 8, F.Y(f(p2, 10)) + 5, 'mañana', { 'font-size': 15, fill: 'var(--accent)', 'font-family': 'Inter', 'font-weight': 700 });
+  txt(g2, F.X(3.3), F.Y(5.05), 'progreso técnico: +g', { 'font-size': 15, fill: 'var(--accent)', 'font-family': 'Inter', 'font-weight': 700, 'text-anchor': 'middle' });
 })();
 
 /* ---------------- Argentina vs counterfactual ---------------- */
