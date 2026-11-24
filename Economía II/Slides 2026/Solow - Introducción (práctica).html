@@ -655,15 +655,58 @@ aside.notes{display:none}
     </div>
     <div>
       <div class="card" data-f="4" style="border-top:5px solid var(--accent)">
-        <h3>La salida: progreso técnico</h3>
-        <p>Si la tecnología mejora a una tasa <i class="v">g</i>:</p>
-        <div class="eq sm"><i>Y<sub>t</sub></i> = <i>AK<sub>t</sub></i><sup><i>α</i></sup>(<i>X<sub>t</sub>N<sub>t</sub></i>)<sup>1−<i>α</i></sup>, &nbsp; <i>X</i><sub><i>t</i>+1</sub> = (1+<i>g</i>)<i>X<sub>t</sub></i></div>
-        <p>…entonces en el largo plazo <b>el ingreso per cápita crece a <i class="v">g</i></b>.</p>
-        <p class="small muted" style="margin-top:8px">→ Es el Ejercicio 2 del TP. Explicar <i class="v">g</i> es tarea de los modelos de <b>crecimiento endógeno</b>.</p>
+        <h3>¿De dónde sale el crecimiento sostenido?</h3>
+        <p>Acumular capital sólo te lleva a un <b>nivel</b> más alto: por los rendimientos decrecientes, la acumulación <b>se frena</b>.</p>
+        <p style="margin-top:10px">Para crecer <b>para siempre</b> hace falta otra cosa: <b class="c-acc">progreso técnico</b>.</p>
+        <p class="small muted" style="margin-top:8px">→ Lo vemos en las próximas slides; es el <b>Ejercicio 2 del TP</b>.</p>
       </div>
     </div>
   </div>
   <aside class="notes">Moraleja: acumular capital sólo te lleva a un nivel más alto; para crecer para siempre hace falta progreso tecnológico. Esto deja planteado el Ejercicio 2.</aside>
+</section>
+
+<!-- ===================== 17b. EVIDENCIA LARGO PLAZO ===================== -->
+<section class="slide" data-sec="5 · Usos y límites">
+  <div class="kicker">5 · La evidencia que falta</div>
+  <h2>Dos siglos de crecimiento sostenido</h2>
+  <div class="cols" style="grid-template-columns:1.32fr .68fr;gap:28px">
+    <div class="graphbox"><svg id="g-long" viewBox="0 0 760 430" width="100%"></svg></div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card" style="padding:14px 18px">
+        <p style="font-size:19px">El modelo básico predice que, al llegar a su <i class="v">k</i>*, el ingreso per cápita <b>se estanca</b>.</p>
+      </div>
+      <div class="card" data-f="1" style="padding:14px 18px;border-left:5px solid var(--prod)">
+        <p style="font-size:19px">Pero los países <b>líderes</b> —ya cerca de su estado estacionario— llevan <b>~200 años</b> creciendo a <b>1,5–2% anual</b>, sin frenarse.</p>
+      </div>
+      <div class="callout" data-f="2" style="padding:12px 16px"><p class="small">El estado estacionario <b>no está quieto</b>: se corre hacia arriba todo el tiempo. Algo empuja la función de producción período a período. Eso es el <b class="c-acc">progreso técnico</b>.</p></div>
+    </div>
+  </div>
+  <p class="muted" style="margin-top:6px;font-size:12px">Escala logarítmica: la <b>pendiente</b> es la tasa de crecimiento. Fuente: Maddison Project Database 2023 — PIB per cápita (US$ internacionales de 2011).</p>
+  <aside class="notes">La idea clave para el E2: el modelo básico dice que al llegar a k* el ingreso per cápita se estanca. Pero EE.UU. y Reino Unido —las economas en la frontera, ya cerca de su EE— crecen a ~1,5–2% anual desde 1820, sin frenarse (EE.UU. ×22, R.U. ×12 en 200 años). En escala log es casi una recta = tasa constante. Avanzar: la línea punteada plana muestra qué habría pasado si la economa ya estuviera en su k* y no hubiera progreso técnico (ilustrativo, anclado en 1870): el ingreso se habra estancado. Toda la brecha hasta la curva real es, en el fondo, progreso técnico. Moraleja: el k* se corre hacia arriba porque la función de producción sube con la tecnologa.</aside>
+</section>
+
+<!-- ===================== 17c. LA SALIDA: PROGRESO TÉCNICO ===================== -->
+<section class="slide" data-sec="5 · Usos y límites">
+  <div class="kicker">5 · La salida</div>
+  <h2>La salida: progreso técnico</h2>
+  <p>El capital solo choca con rendimientos decrecientes. La salida es que la <b>tecnología mejore período a período</b> y corra la función de producción <b>hacia arriba</b>.</p>
+  <div class="cols" style="grid-template-columns:1.02fr .98fr;gap:30px;margin-top:10px">
+    <div>
+      <div class="card" style="border-left:6px solid var(--accent)">
+        <h3>Trabajo en unidades de eficiencia</h3>
+        <div class="eq sm left" style="margin:8px 0"><i>Y<sub>t</sub></i> = <i>AK<sub>t</sub></i><sup><i>α</i></sup>(<i>X<sub>t</sub>N<sub>t</sub></i>)<sup>1−<i>α</i></sup></div>
+        <div class="eq sm left" style="margin:8px 0"><i>X</i><sub><i>t</i>+1</sub> = (1+<i>g</i>)<i>X<sub>t</sub></i></div>
+        <p style="font-size:18px"><i class="v">X<sub>t</sub></i> es la <b>productividad del trabajo</b>, que crece a tasa <i class="v">g</i>: con el tiempo, cada trabajador “rinde como si fueran más trabajadores”.</p>
+        <p class="small muted" style="margin-top:8px">Ej.: con <b>computadora</b> se produce muchísimo más que con lápiz y papel, aun con el mismo capital físico por cabeza.</p>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="graphbox"><svg id="g-tech" viewBox="0 0 520 300" width="100%"></svg></div>
+      <div class="callout" data-f="1" style="padding:12px 18px"><p><b>En el largo plazo</b>, <i class="v">y</i>, <i class="v">c</i> y <i class="v">k</i> crecen todas a la tasa <b class="c-acc"><i>g</i></b>: el motor del crecimiento sostenido es la <b>tecnología</b>, no la acumulación de capital.</p></div>
+    </div>
+  </div>
+  <p class="muted" style="margin-top:8px;font-size:13px">Solow toma <i class="v">g</i> como <b>exógeno</b>; explicar de dónde sale es tarea del <b>crecimiento endógeno</b> (Romer, Lucas). → <b>Ejercicio 2 del TP.</b></p>
+  <aside class="notes">El truco del E2: el progreso técnico entra como X (aumentador de trabajo / Harrod-neutral), que crece a g. Se trabaja con variables por “unidad de eficiencia” (dividir por X·N en vez de N): ahí hay un estado estacionario como antes. Pero volviendo a per cápita (dividir por N), y, c, k crecen todas a g en el largo plazo; las agregadas a g+n. El gráfico muestra la intuición: la tecnologa corre la curva de producción hacia arriba cada período, así que k nunca “alcanza” a un techo fijo. g es exógeno (dado); de dónde sale g lo responde el crecimiento endógeno. Esto es exactamente el Ejercicio 2.</aside>
 </section>
 
 <!-- ===================== 18. PARA LLEVARSE ===================== -->
@@ -700,33 +743,6 @@ aside.notes{display:none}
     </div>
   </div>
   <aside class="notes">A partir de acá, pizarrón. Sugerencia de tiempos: inciso 1 ≈ 12′, inciso 2 ≈ 15′, inciso 3 ≈ 13′, inciso 4 ≈ 10′. Se puede volver al laboratorio y a la slide de transición para chequear los incisos 3 y 4.</aside>
-</section>
-
-<!-- ===================== 20. APÉNDICE ===================== -->
-<section class="slide" data-sec="Apéndice · para chequear">
-  <span class="tag-app">Backup · no mostrar antes</span>
-  <div class="kicker">Apéndice</div>
-  <h2>Resultados para chequear</h2>
-  <div class="cols" style="grid-template-columns:1.05fr .95fr;gap:30px">
-    <div class="card">
-      <div class="eq sm left" style="margin:4px 0"><i>k</i>* = <span class="par">(</span><span class="frac"><span><i>sA</i></span><span><i>n</i>+<i>δ</i></span></span><span class="par">)</span><sup><span class="frac"><span>1</span><span>1−<i>α</i></span></span></sup> <span class="m c-acc" style="float:right;font-size:24px">= 4</span></div>
-      <div class="eq sm left" style="margin:4px 0"><i>y</i>* = <i>A</i><span class="par">(</span><span class="frac"><span><i>sA</i></span><span><i>n</i>+<i>δ</i></span></span><span class="par">)</span><sup><span class="frac"><span><i>α</i></span><span>1−<i>α</i></span></span></sup> <span class="m c-acc" style="float:right;font-size:24px">= 2</span></div>
-      <div class="eq sm left" style="margin:4px 0"><i>i</i>* = (<i>n</i>+<i>δ</i>)<i>k</i>* <span class="m c-acc" style="float:right;font-size:24px">= 0,4</span></div>
-      <div class="eq sm left" style="margin:4px 0"><i>c</i>* = (1−<i>s</i>)<i>y</i>* <span class="m c-acc" style="float:right;font-size:24px">= 1,6</span></div>
-      <p class="small muted" style="margin-top:8px">Inciso 4: <i class="v">k</i><sub>0</sub> = 3,98 &lt; <i class="v">k</i>* = 4 → las variables per cápita crecen (cada vez más lento) hasta el EE; las agregadas crecen a una tasa <b>apenas mayor que <i class="v">n</i> = 5%</b> y convergen a <i class="v">n</i>.</p>
-    </div>
-    <div>
-      <table style="width:100%;border-collapse:collapse;font-size:19px;text-align:center" class="m">
-        <tr style="border-bottom:2px solid var(--line);font-family:var(--sans);font-size:15px;color:var(--muted)"><th style="text-align:left;padding:6px">↑ en…</th><th>k*</th><th>y*</th><th>i*</th><th>c*</th></tr>
-        <tr style="border-bottom:1px solid var(--line)"><td style="text-align:left;padding:8px"><i>s</i></td><td>↑</td><td>↑</td><td>↑</td><td>↑ si <i>s</i>&lt;<i>α</i><br>↓ si <i>s</i>&gt;<i>α</i></td></tr>
-        <tr style="border-bottom:1px solid var(--line)"><td style="text-align:left;padding:8px"><i>A</i></td><td>↑</td><td>↑</td><td>↑</td><td>↑</td></tr>
-        <tr style="border-bottom:1px solid var(--line)"><td style="text-align:left;padding:8px"><i>δ</i> (o <i>n</i>)</td><td>↓</td><td>↓</td><td>↓</td><td>↓</td></tr>
-        <tr><td style="text-align:left;padding:8px"><i>α</i></td><td colspan="4">↑ todas <b>si <i>sA</i> &gt; <i>n</i>+<i>δ</i></b><br><span style="font-size:15px;font-family:var(--sans);color:var(--muted)">(la base del exponente &gt; 1, como en el inciso 4)</span></td></tr>
-      </table>
-      <div class="callout warn" style="margin-top:14px;padding:10px 16px"><p class="small">La resolución pone “↑” para <i class="v">α</i> sin condición; vale si <span class="m"><i>sA</i>/(<i>n</i>+<i>δ</i>) &gt; 1</span>. Si fuera &lt; 1, <i class="v">k</i>* <b>bajaría</b> al subir <i class="v">α</i>.</p></div>
-    </div>
-  </div>
-  <aside class="notes">Slide de respaldo para vos. Ojo con i*: la resolución lo escribe como (sA)^{1/(1−α)} / (n+δ)^{α/(1−α)}, que es lo mismo que (n+δ)k*.</aside>
 </section>
 
 </div><!-- /deck -->
@@ -1106,6 +1122,60 @@ function solowGraph(svg, p, opts) {
   const m = el('g', { 'data-f': 1 }, svg);
   el('circle', { cx: F.X(Y0 + yr), cy: F.Y(L(KOR[yr])), r: 6, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 2 }, m);
   txt(m, F.X(Y0 + yr) + 10, F.Y(L(KOR[yr])) + 26, `${Y0 + yr}: Corea pasa a Argentina`, { 'font-size': 14, fill: 'var(--ink)', 'font-family': 'Inter', 'font-weight': 600 });
+})();
+
+/* ---------------- long-run growth (log) ---------------- */
+(function longrun() {
+  // Maddison Project Database 2023, PIB per cápita (US$ internacionales 2011)
+  const USA = [2674, 2715, 2791, 2760, 2836, 2898, 2918, 2930, 2930, 2833, 3039, 3226, 3343, 3460, 3295, 3420, 3470, 3361, 3330, 3492, 3319, 3253, 3223, 3274, 3453, 3506, 3526, 3619, 3713, 3616, 3632, 3778, 3971, 4242, 4254, 4161, 4248, 4156, 4177, 4289, 4402, 4312, 4447, 4734, 4889, 4637, 4600, 4752, 4816, 4943, 4803, 4919, 4992, 5117, 4965, 5105, 5050, 5099, 5199, 5716, 6256, 6317, 6558, 6559, 6523, 6424, 6472, 6617, 6447, 6706, 6665, 6811, 7324, 6834, 6510, 7160, 6886, 7406, 7427, 7959, 8038, 8770, 8684, 8941, 8664, 9121, 9980, 9951, 8976, 9798, 9637, 9736, 9977, 10108, 9096, 9164, 10222, 9769, 10471, 10450, 10153, 9675, 10010, 11071, 11127, 11150, 11648, 11532, 11451, 11954, 10695, 9931, 8381, 8048, 8667, 9681, 10568, 11295, 10526, 11171, 12005, 13553, 14870, 16050, 16999, 16478, 14822, 14312, 14734, 14197, 15240, 16125, 16444, 16917, 16512, 17370, 17397, 17406, 16946, 17900, 18057, 18175, 18976, 19514, 20360, 21390, 22529, 22842, 23691, 24195, 23958, 24394, 25414, 26602, 26286, 25956, 27058, 28001, 29286, 29949, 29611, 30056, 29210, 30158, 32076, 33023, 33850, 34730, 35863, 36756, 36982, 36464, 37240, 37762, 38807, 39391, 40413, 41723, 43073, 44576, 45886, 45878, 46266, 47158, 48493, 49655, 50490, 50902, 50276, 48453, 49267, 49675, 50436, 51011, 51797, 52808, 53301, 54152, 55455, 56469, 54379, 57523, 58487];
+  const GBR = [3306, 3308, 3315, 3359, 3492, 3521, 3290, 3499, 3461, 3443, 3550, 3545, 3612, 3599, 3639, 3861, 3937, 3857, 3963, 3881, 4018, 3894, 3808, 3950, 4245, 4387, 4334, 4234, 4361, 4422, 4332, 4477, 4626, 4734, 4909, 4748, 5013, 5019, 4879, 5031, 5086, 5024, 4764, 5165, 5255, 5333, 5451, 5424, 5636, 5635, 5829, 5797, 5769, 5842, 5874, 5950, 5938, 5923, 5879, 5786, 5997, 6146, 6269, 6264, 6220, 6132, 6170, 6358, 6585, 6876, 6845, 6781, 6553, 6486, 6851, 6996, 7211, 7229, 7500, 7729, 7594, 7516, 7635, 7482, 7455, 7603, 7782, 7855, 7461, 7557, 7718, 7874, 7954, 8212, 8131, 8639, 8702, 8665, 8630, 7605, 7017, 6792, 7391, 7587, 7844, 8199, 7868, 8472, 8539, 8772, 8673, 8190, 8206, 8411, 8939, 9244, 9620, 9911, 9988, 9982, 10928, 11926, 12176, 12344, 11803, 11247, 10751, 10527, 10753, 11088, 11061, 11354, 11303, 11709, 12145, 12541, 12639, 12779, 12698, 13134, 13780, 14118, 14131, 14583, 15251, 15545, 15757, 16018, 16593, 16820, 17162, 17440, 18002, 19168, 18903, 18884, 19311, 19740, 20448, 20988, 20612, 20319, 20650, 21366, 21869, 22579, 23498, 24536, 25679, 26164, 26189, 25792, 25790, 26349, 27278, 27861, 28472, 29260, 30077, 30933, 31946, 32660, 33271, 34232, 34866, 35624, 36214, 36817, 36265, 34402, 34754, 34971, 35244, 35661, 36522, 37101, 37594, 38284, 38705, 39113, 34651, 37134, 38407];
+  const Y0 = 1820, T = USA.length - 1;
+  const svg = $('#g-long');
+  if (!svg) return;
+  const L = Math.log10, lo = 2000, hi = 80000;
+  const F = frame(svg, { W: 760, H: 430, ml: 74, mr: 118, mt: 24, mb: 42, xmin: Y0, xmax: Y0 + T, ymin: L(lo), ymax: L(hi) });
+  const gt = el('g', { class: 'tick' }, svg);
+  [2000, 5000, 10000, 20000, 50000].forEach(v => {
+    el('line', { x1: F.X(Y0), y1: F.Y(L(v)), x2: F.X(Y0 + T), y2: F.Y(L(v)), class: 'grid' }, gt);
+    txt(gt, F.X(Y0) - 8, F.Y(L(v)) + 4, 'US$ ' + (v / 1000) + 'k', { 'text-anchor': 'end' });
+  });
+  for (let y = 1840; y <= 2020; y += 40) txt(gt, F.X(y), F.Y(L(lo)) + 22, y, { 'text-anchor': 'middle' });
+  el('line', { x1: F.X(Y0), y1: F.Y(L(lo)), x2: F.X(Y0 + T), y2: F.Y(L(lo)), class: 'axis' }, svg);
+  const line = a => a.map((v, t) => (t ? 'L' : 'M') + F.X(Y0 + t).toFixed(1) + ',' + F.Y(L(v)).toFixed(1)).join('');
+  // flat "no technical progress" prediction (fragment), anchored at 1870
+  const fy = 1870 - Y0, flatLvl = USA[fy];
+  const fg = el('g', { 'data-f': 1 }, svg);
+  let d = 'M' + F.X(1870).toFixed(1) + ',' + F.Y(L(flatLvl)).toFixed(1);
+  for (let t = fy; t <= T; t++) d += 'L' + F.X(Y0 + t).toFixed(1) + ',' + F.Y(L(USA[t])).toFixed(1);
+  d += 'L' + F.X(Y0 + T).toFixed(1) + ',' + F.Y(L(flatLvl)).toFixed(1) + 'Z';
+  el('path', { d: d, fill: 'var(--accent)', opacity: .1 }, fg);
+  el('line', { x1: F.X(1870), y1: F.Y(L(flatLvl)), x2: F.X(Y0 + T), y2: F.Y(L(flatLvl)), stroke: 'var(--muted)', 'stroke-width': 2, 'stroke-dasharray': '7 6' }, fg);
+  txt(fg, F.X(1946), F.Y(L(flatLvl)) - 9, 'sin progreso técnico: el ingreso se estanca', { 'font-size': 13.5, fill: 'var(--muted)', 'font-family': 'Inter', 'font-style': 'italic', 'text-anchor': 'middle' });
+  txt(fg, F.X(2007), F.Y(L(16000)), 'todo esto es', { 'font-size': 13, fill: 'var(--accent)', 'font-family': 'Inter', 'text-anchor': 'middle' });
+  txt(fg, F.X(2007), F.Y(L(12000)), 'progreso técnico', { 'font-size': 13, fill: 'var(--accent)', 'font-family': 'Inter', 'font-weight': 700, 'text-anchor': 'middle' });
+  // country lines (always, drawn on top)
+  const g = el('g', { class: 'always' }, svg);
+  el('path', { d: line(GBR), fill: 'none', stroke: 'var(--violet)', 'stroke-width': 3, class: 'draw', pathLength: 1 }, g);
+  txt(g, F.X(Y0 + T) + 8, F.Y(L(GBR[T])) + 5, 'Reino Unido', { 'font-size': 15, fill: 'var(--violet)', 'font-family': 'Inter', 'font-weight': 700 });
+  el('path', { d: line(USA), fill: 'none', stroke: 'var(--prod)', 'stroke-width': 3.5, class: 'draw', pathLength: 1 }, g);
+  txt(g, F.X(Y0 + T) + 8, F.Y(L(USA[T])) - 6, 'EE.UU.', { 'font-size': 15, fill: 'var(--prod)', 'font-family': 'Inter', 'font-weight': 700 });
+})();
+
+/* ---------------- technical progress shifts the curve ---------------- */
+(function tech() {
+  const svg = $('#g-tech');
+  if (!svg) return;
+  const p = { a: .5, A: 1 }, p2 = { a: .5, A: 1.7 };
+  const F = frame(svg, { W: 520, H: 300, ml: 42, mr: 44, mt: 24, mb: 36, xmax: 10, ymax: 4.4 });
+  axes(svg, F, 'k', '<tspan font-style="italic">y</tspan>');
+  const g1 = el('g', { class: 'always' }, svg);
+  el('path', { d: curve(k => f(p, k), F, 0, 10), fill: 'none', stroke: 'var(--prod)', 'stroke-width': 3.5, class: 'draw', pathLength: 1 }, g1);
+  txt(g1, F.X(10) + 6, F.Y(f(p, 10)) + 6, 'hoy', { 'font-size': 14, fill: 'var(--prod)', 'font-family': 'Inter', 'font-weight': 700 });
+  const g2 = el('g', { 'data-f': 1 }, svg);
+  el('path', { d: curve(k => f(p2, k), F, 0, 10), fill: 'none', stroke: 'var(--accent)', 'stroke-width': 3.5 }, g2);
+  txt(g2, F.X(10) + 6, F.Y(f(p2, 10)) + 6, 'mañana', { 'font-size': 14, fill: 'var(--accent)', 'font-family': 'Inter', 'font-weight': 700 });
+  [2.6, 5.5].forEach(k => el('line', { x1: F.X(k), y1: F.Y(f(p, k)) - 3, x2: F.X(k), y2: F.Y(f(p2, k)) + 3, stroke: 'var(--accent)', 'stroke-width': 2.5, 'marker-end': F.arrow }, g2));
+  txt(g2, F.X(4), F.Y(3.95), 'progreso técnico: +g', { 'font-size': 15, fill: 'var(--accent)', 'font-family': 'Inter', 'font-weight': 700, 'text-anchor': 'middle' });
 })();
 
 /* ---------------- Argentina vs counterfactual ---------------- */
